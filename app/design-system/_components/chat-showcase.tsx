@@ -107,7 +107,9 @@ function Bubble({
       data-slot="message-bubble"
       className={cn(
         "max-w-[85%] rounded-3xl px-3.5 py-2 leading-relaxed text-pretty",
-        role === "user" ? "bg-brand text-brand-foreground" : "bg-neutral"
+        role === "user"
+          ? "bg-brand-background text-brand-foreground"
+          : "bg-neutral-background"
       )}
     >
       {children}
@@ -120,7 +122,7 @@ function Avatar({ role }: { role: ChatMessage["role"] }) {
     <MessageAvatar
       className={cn(
         "size-8 text-xs font-medium",
-        role === "user" && "bg-brand-subtle text-brand"
+        role === "user" && "bg-brand-subtle text-brand-background"
       )}
     >
       {role === "user" ? "AM" : "MF"}
@@ -180,7 +182,7 @@ function TypingIndicator() {
       <MessageContent>
         <div
           data-slot="message-bubble"
-          className="flex w-fit items-center gap-2 rounded-3xl bg-neutral px-3.5 py-2 text-neutral-foreground"
+          className="flex w-fit items-center gap-2 rounded-3xl bg-neutral-background px-3.5 py-2 text-neutral-foreground"
         >
           <Spinner className="size-3.5" />
           Checking your feed…
@@ -230,7 +232,7 @@ function ChatCard() {
       <CardHeader className="border-b py-4 [.border-b]:pb-4">
         <CardTitle>Feed assistant</CardTitle>
         <CardDescription className="flex items-center gap-1.5">
-          <span className="size-2 rounded-full bg-brand" />
+          <span className="size-2 rounded-full bg-brand-background" />
           Llama 3.2 3B · running locally
         </CardDescription>
         <CardAction>

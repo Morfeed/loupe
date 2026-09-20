@@ -241,10 +241,11 @@ const timeFormatter = new Intl.DateTimeFormat("en-US", {
 })
 
 const verdictStyles: Record<Verdict, string> = {
-  hidden: "bg-neutral text-neutral-foreground",
-  blurred: "bg-accent text-accent-foreground",
-  labeled: "bg-info-subtle text-info",
-  kept: "bg-success-subtle text-success",
+  hidden: "bg-neutral-background text-neutral-foreground",
+  /* text-action-brand-background, not text-brand-background: brand on brand-subtle is only 4.29:1 */
+  blurred: "bg-brand-subtle text-action-brand-background",
+  labeled: "bg-info-subtle text-info-background",
+  kept: "bg-success-subtle text-success-background",
 }
 
 const features = tableFeatures({
@@ -279,11 +280,11 @@ function VerdictPill({ verdict }: { verdict: Verdict }) {
 function ToxicityScore({ value }: { value: number }) {
   return (
     <div className="flex items-center justify-end gap-2">
-      <div className="h-1.5 w-12 overflow-hidden rounded-full bg-neutral">
+      <div className="h-1.5 w-12 overflow-hidden rounded-full bg-neutral-background">
         <div
           className={cn(
             "h-full rounded-full",
-            value >= 70 ? "bg-danger" : "bg-brand"
+            value >= 70 ? "bg-danger-background" : "bg-brand-background"
           )}
           style={{ width: `${value}%` }}
         />

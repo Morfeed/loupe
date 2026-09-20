@@ -15,7 +15,7 @@ function Switch({
       data-slot="switch"
       data-size={size}
       className={cn(
-        "peer group/switch relative inline-flex shrink-0 items-center rounded-full border-2 transition-all outline-none group-has-[:focus-visible]/field-label:ring-0 after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-halo aria-invalid:border-danger aria-invalid:ring-3 aria-invalid:ring-danger-halo data-[size=default]:h-5 data-[size=default]:w-11 data-[size=sm]:h-4 data-[size=sm]:w-7 data-checked:border-action data-checked:bg-action group-has-[:focus-visible]/field-label:data-checked:border-action data-unchecked:border-transparent data-unchecked:bg-neutral group-has-[:focus-visible]/field-label:data-unchecked:border-transparent data-disabled:cursor-not-allowed data-disabled:opacity-50",
+        "peer group/switch relative inline-flex shrink-0 items-center rounded-full border-2 transition-all outline-none group-has-[:focus-visible]/field-label:ring-0 after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-halo aria-invalid:border-danger-line aria-invalid:ring-3 aria-invalid:ring-danger-halo data-[size=default]:h-5 data-[size=default]:w-11 data-[size=sm]:h-4 data-[size=sm]:w-7 data-checked:border-action-brand-background data-checked:bg-action-brand-background group-has-[:focus-visible]/field-label:data-checked:border-action-brand-background data-unchecked:border-transparent data-unchecked:bg-neutral-background group-has-[:focus-visible]/field-label:data-unchecked:border-transparent data-disabled:cursor-not-allowed data-disabled:opacity-50",
         className
       )}
       {...props}

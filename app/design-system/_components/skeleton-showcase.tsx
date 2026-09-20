@@ -23,7 +23,7 @@ export function SkeletonShowcase() {
         <Spinner className="size-3" />
         <Spinner />
         <Spinner className="size-6 text-neutral-foreground" />
-        <Spinner className="size-8 text-brand" />
+        <Spinner className="size-8 text-brand-background" />
         <Button disabled>
           <Spinner data-icon="inline-start" />
           Classifying

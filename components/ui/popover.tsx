@@ -36,7 +36,7 @@ function PopoverContent({
         <PopoverPrimitive.Popup
           data-slot="popover-content"
           className={cn(
-            "popup-inverted z-50 flex w-72 origin-(--transform-origin) flex-col gap-4 p-4 text-sm",
+            "popover-surface z-50 flex w-72 origin-(--transform-origin) flex-col gap-4 p-4 text-sm",
             className
           )}
           {...props}

@@ -14,7 +14,7 @@ export function ShadowShowcase() {
       {shadows.map((shadow) => (
         <div
           key={shadow.name}
-          className={`flex h-28 items-center justify-center rounded-3xl bg-card text-sm font-medium ${shadow.className}`}
+          className={`flex h-28 items-center justify-center rounded-3xl bg-card-background text-sm font-medium ${shadow.className}`}
         >
           {shadow.name}
         </div>

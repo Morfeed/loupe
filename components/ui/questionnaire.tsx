@@ -106,7 +106,7 @@ function QuestionnaireChoice({
     <QuestionnairePrimitive.Choice
       data-slot="questionnaire-choice"
       className={cn(
-        "group/questionnaire-choice relative flex min-h-11 cursor-pointer items-start gap-2.5 rounded-3xl border border-border px-4 py-3 text-start text-sm transition-colors outline-none select-none hover:bg-action-neutral has-[>input:focus-visible]:border-ring has-[>input:focus-visible]:ring-3 has-[>input:focus-visible]:ring-halo data-invalid:border-danger data-checked:border-action data-checked:bg-action-subtle data-checked:hover:bg-action-subtle",
+        "group/questionnaire-choice relative flex min-h-11 cursor-pointer items-start gap-2.5 rounded-3xl border border-border px-4 py-3 text-start text-sm transition-colors outline-none select-none hover:bg-action-neutral-background has-[>input:focus-visible]:border-ring has-[>input:focus-visible]:ring-3 has-[>input:focus-visible]:ring-halo data-invalid:border-danger-line data-checked:border-action-brand-background data-checked:bg-action-brand-subtle data-checked:hover:bg-action-brand-subtle",
         "data-disabled:pointer-events-none data-disabled:cursor-not-allowed data-disabled:opacity-50",
         className
       )}
@@ -119,11 +119,11 @@ function QuestionnaireChoice({
       <span
         aria-hidden="true"
         data-slot="questionnaire-choice-indicator"
-        className="pointer-events-none relative flex size-4 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-[5px] border border-transparent bg-neutral group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 group-data-[type=radio]/questionnaire-choice:rounded-full group-data-checked/questionnaire-choice:border-action group-data-checked/questionnaire-choice:bg-action group-data-checked/questionnaire-choice:text-action-foreground"
+        className="pointer-events-none relative flex size-4 shrink-0 translate-y-[--spacing(0.45)] items-center justify-center rounded-[5px] border border-transparent bg-neutral-background group-has-data-[slot=questionnaire-choice-description]/questionnaire-choice:translate-y-0.5 group-data-[type=radio]/questionnaire-choice:rounded-full group-data-checked/questionnaire-choice:border-action-brand-background group-data-checked/questionnaire-choice:bg-action-brand-background group-data-checked/questionnaire-choice:text-action-brand-foreground"
       >
         <span
           data-slot="questionnaire-choice-indicator-dot"
-          className="hidden size-(--control-dot) rounded-full bg-action-foreground group-data-[type=checkbox]/questionnaire-choice:hidden group-data-checked/questionnaire-choice:block"
+          className="hidden size-(--control-dot) rounded-full bg-action-brand-foreground group-data-[type=checkbox]/questionnaire-choice:hidden group-data-checked/questionnaire-choice:block"
         />
         <CheckIcon
           data-slot="questionnaire-choice-indicator-check"
@@ -169,8 +169,8 @@ function QuestionnaireInput({
       <QuestionnairePrimitive.Input
         data-slot="questionnaire-input"
         className={cn(
-          "h-9 min-h-11 w-full min-w-0 rounded-3xl border border-transparent bg-field px-3 py-1 text-base transition-[color,box-shadow,background-color] outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-halo disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-danger aria-invalid:ring-3 aria-invalid:ring-danger-halo sm:min-h-0 md:text-sm",
-          "selection:bg-action selection:text-action-foreground placeholder:text-neutral-foreground",
+          "h-9 min-h-11 w-full min-w-0 rounded-3xl border border-transparent bg-field px-3 py-1 text-base transition-[color,box-shadow,background-color] outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-halo disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-danger-line aria-invalid:ring-3 aria-invalid:ring-danger-halo sm:min-h-0 md:text-sm",
+          "selection:bg-action-brand-background selection:text-action-brand-foreground placeholder:text-neutral-foreground",
           className
         )}
         {...props}
@@ -186,7 +186,7 @@ function QuestionnaireError({
   return (
     <QuestionnairePrimitive.Error
       data-slot="questionnaire-error"
-      className={cn("mt-2 text-sm text-danger", className)}
+      className={cn("mt-2 text-sm text-danger-background", className)}
       {...props}
     />
   )

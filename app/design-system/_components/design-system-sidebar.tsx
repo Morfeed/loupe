@@ -69,14 +69,12 @@ export function DesignSystemSidebar() {
               render={<a href="#top" />}
               onClick={handleNavigate}
             >
-              <div className="flex size-8 items-center justify-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground">
+              <div className="flex size-8 items-center justify-center rounded-xl bg-brand-background text-brand-foreground">
                 <SwatchBookIcon />
               </div>
               <div className="grid flex-1 text-left leading-tight">
                 <span className="truncate font-medium">Morfeed</span>
-                <span className="truncate text-xs text-neutral-foreground">
-                  Design system
-                </span>
+                <span className="truncate text-xs">Design system</span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>

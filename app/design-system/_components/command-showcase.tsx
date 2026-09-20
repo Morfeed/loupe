@@ -145,7 +145,7 @@ export function CommandShowcase() {
       <Preview className="justify-center">
         <Button variant="outline" onClick={() => setOpen(true)}>
           Open command palette
-          <kbd className="ml-1 rounded-md bg-neutral px-1.5 font-mono text-xs text-neutral-foreground">
+          <kbd className="ml-1 rounded-md bg-neutral-background px-1.5 font-mono text-xs text-neutral-foreground">
             ⌘K
           </kbd>
         </Button>

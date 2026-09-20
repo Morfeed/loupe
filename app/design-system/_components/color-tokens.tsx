@@ -12,15 +12,33 @@ type TokenPair = {
 const paletteSteps = [
   "50",
   "100",
+  "150",
   "200",
+  "250",
   "300",
+  "350",
   "400",
+  "450",
   "500",
+  "550",
   "600",
+  "650",
   "700",
+  "750",
   "800",
+  "850",
   "900",
   "950",
+]
+
+/* Drop 950 from the shared ladder so the dark surface steps stay in order */
+const graphiteSteps = [
+  "25",
+  ...paletteSteps.slice(0, -1),
+  "925",
+  "950",
+  "975",
+  "985",
 ]
 
 const interactiveGroup = (
@@ -33,7 +51,7 @@ const interactiveGroup = (
   description,
   columns: "grid-cols-2 lg:grid-cols-3",
   pairs: [
-    { background: base, foreground },
+    { background: `${base}-background`, foreground },
     { background: `${base}-hover`, foreground },
     { background: `${base}-active`, foreground },
   ],
@@ -48,30 +66,31 @@ const colorGroups: {
   {
     title: "Surfaces",
     description:
-      "Page, card and popover layers with their foreground pairs, plus the translucent modal overlay. Frosted surfaces use opacity modifiers like bg-popover/70 instead of dedicated tokens.",
+      "Page, card, dialog and popover layers with their foreground pairs, plus the translucent modal overlay. Dialog covers Dialog, AlertDialog, Drawer, Sheet and Toast. Popover covers Popover, DropdownMenu, Select and Command. Popover-subtle is the recessed layer inside a popover: fields and the highlighted item. Frosted surfaces use opacity modifiers like bg-popover-background/70 instead of dedicated tokens.",
     columns: "grid-cols-2 lg:grid-cols-3",
     pairs: [
       { background: "background", foreground: "foreground" },
-      { background: "card", foreground: "card-foreground" },
-      { background: "popover", foreground: "popover-foreground" },
+      { background: "card-background", foreground: "card-foreground" },
+      { background: "dialog-background", foreground: "dialog-foreground" },
+      { background: "popover-background", foreground: "popover-foreground" },
+      { background: "popover-subtle" },
       { background: "overlay" },
     ],
   },
   {
     title: "Identity",
     description:
-      "Static colors with no hover or active state. Brand is navy-900 oklch(0.379 0.138 258.4); neutral covers quiet surfaces and secondary text; accent is fill-only in light mode.",
+      "Static colors with no hover or active state. Brand is azure-600, the #006aff brand color itself; neutral covers quiet surfaces and secondary text.",
     columns: "grid-cols-2 lg:grid-cols-3",
     pairs: [
-      { background: "brand", foreground: "brand-foreground" },
-      { background: "neutral", foreground: "neutral-foreground" },
-      { background: "accent", foreground: "accent-foreground" },
+      { background: "brand-background", foreground: "brand-foreground" },
+      { background: "neutral-background", foreground: "neutral-foreground" },
     ],
   },
   interactiveGroup(
-    "Action",
-    "action",
-    "Primary buttons, links and checked controls. Hover and active keep action-foreground readable."
+    "Brand action",
+    "action-brand",
+    "Primary buttons, links and checked controls. Hover and active keep action-brand-foreground readable."
   ),
   interactiveGroup(
     "Neutral action",
@@ -87,55 +106,68 @@ const colorGroups: {
   {
     title: "Status",
     description:
-      "Success, info, danger and warning. Warning is fill-only in light mode.",
+      "Success, info, danger and warning. Warning is fill-only in light mode. For a status border use the matching line token, not the fill.",
     columns: "grid-cols-2 lg:grid-cols-3",
     pairs: [
-      { background: "success", foreground: "success-foreground" },
-      { background: "info", foreground: "info-foreground" },
-      { background: "danger", foreground: "danger-foreground" },
-      { background: "warning", foreground: "warning-foreground" },
+      { background: "success-background", foreground: "success-foreground" },
+      { background: "info-background", foreground: "info-foreground" },
+      { background: "danger-background", foreground: "danger-foreground" },
+      { background: "warning-background", foreground: "warning-foreground" },
     ],
   },
   {
     title: "Lines",
-    description: "Borders, focus rings and invalid rings.",
+    description:
+      "Borders, focus rings and invalid rings. A status line carries the fill color so it reads at full strength on an invalid control, and takes an opacity modifier where a softer edge is wanted, like border-danger-line/30 on a toast.",
     columns: "grid-cols-2 lg:grid-cols-3",
     pairs: [
       { background: "border" },
       { background: "ring" },
       { background: "halo" },
       { background: "danger-halo" },
+      { background: "success-line" },
+      { background: "info-line" },
+      { background: "danger-line" },
+      { background: "warning-line" },
     ],
   },
   {
     title: "Controls",
     description:
-      "Field fill for inputs, textareas, selects, picker triggers, checkboxes and radios; slider and switch thumb; active tab pill.",
+      "Field fill for inputs, textareas, selects, picker triggers, checkboxes and radios; slider and switch thumb; active tab pill. Calendar today and selected day follow neutral and action-brand, so a recolor of either carries through.",
     columns: "grid-cols-2 lg:grid-cols-3",
     pairs: [
       { background: "field", foreground: "foreground" },
       { background: "thumb" },
       { background: "tabs", foreground: "foreground" },
+      {
+        background: "calendar-today-background",
+        foreground: "calendar-today-foreground",
+      },
+      {
+        background: "calendar-selected-day-background",
+        foreground: "calendar-selected-day-foreground",
+      },
     ],
   },
   {
     title: "Tints",
     description:
-      "Solid low-emphasis fills for badges, avatars and selected states. Pair each with its base color as text.",
+      "Solid low-emphasis fills for badges, avatars and selected states. Pair each with its base color as text. Brand is the exception: brand on brand-subtle is 4.29:1, so small text uses action-brand instead.",
     columns: "grid-cols-2 lg:grid-cols-3",
     pairs: [
-      { background: "brand-subtle", foreground: "brand" },
-      { background: "action-subtle", foreground: "action" },
+      { background: "brand-subtle", foreground: "action-brand-background" },
+      { background: "action-brand-subtle", foreground: "action-brand-background" },
       { background: "neutral-subtle", foreground: "neutral-foreground" },
-      { background: "success-subtle", foreground: "success" },
-      { background: "info-subtle", foreground: "info" },
-      { background: "danger-subtle", foreground: "danger" },
+      { background: "success-subtle", foreground: "success-background" },
+      { background: "info-subtle", foreground: "info-background" },
+      { background: "danger-subtle", foreground: "danger-background" },
       { background: "warning-subtle", foreground: "foreground" },
     ],
   },
   {
     title: "Chart",
-    description: "Sequential navy scale used by every chart.",
+    description: "Sequential azure scale used by every chart.",
     columns: "grid-cols-2 lg:grid-cols-3",
     pairs: [
       { background: "chart-1" },
@@ -150,40 +182,30 @@ const colorGroups: {
     description: "Sidebar tokens now point at brand and neutral.",
     columns: "grid-cols-2 lg:grid-cols-3",
     pairs: [
-      { background: "sidebar", foreground: "sidebar-foreground" },
+      { background: "sidebar-background", foreground: "sidebar-foreground" },
       {
-        background: "sidebar-primary",
-        foreground: "sidebar-primary-foreground",
+        background: "sidebar-accent-background",
+        foreground: "sidebar-accent-foreground",
       },
-      { background: "sidebar-accent", foreground: "sidebar-accent-foreground" },
       { background: "sidebar-border" },
       { background: "sidebar-ring" },
     ],
   },
   {
-    title: "Navy palette",
+    title: "Azure palette",
     description:
-      "Primitive scale behind brand and action. Every palette shares the same OKLCH lightness per step, so navy-600 and aqua-600 have matching contrast.",
+      "Primitive scale behind brand and action, on the shared ladder in steps of 50. Hue and chroma come from the #006aff brand color. Step 600 is pinned to that exact hex at lightness 0.571; every other step holds its lightness parity with graphite.",
     columns: "grid-cols-2 lg:grid-cols-3",
-    pairs: paletteSteps.map((step) => ({ background: `color-navy-${step}` })),
-  },
-  {
-    title: "Aqua palette",
-    description:
-      "Primitive scale behind accent, on the same lightness ladder as navy and graphite.",
-    columns: "grid-cols-2 lg:grid-cols-3",
-    pairs: paletteSteps.map((step) => ({ background: `color-aqua-${step}` })),
+    pairs: paletteSteps.map((step) => ({ background: `color-azure-${step}` })),
   },
   {
     title: "Graphite palette",
     description:
-      "Achromatic scale on the shared lightness ladder, plus 925, 975 and 985 surface steps for VS Code–style charcoal dark mode.",
+      "Achromatic scale on the shared lightness ladder. Half steps sit at the exact lightness midpoint of their neighbours. Steps 25, 925, 975 and 985 are surface steps for VS Code–style charcoal dark mode.",
     columns: "grid-cols-2 lg:grid-cols-3",
-    pairs: [...paletteSteps.slice(0, -1), "925", "950", "975", "985"].map(
-      (step) => ({
-        background: `color-graphite-${step}`,
-      })
-    ),
+    pairs: graphiteSteps.map((step) => ({
+      background: `color-graphite-${step}`,
+    })),
   },
 ]
 
@@ -284,7 +306,7 @@ function TokenValue({ name }: { name: string }) {
 
 function TokenCard({ background, foreground }: TokenPair) {
   return (
-    <div className="flex min-w-0 flex-col overflow-hidden rounded-3xl bg-card ring-1 ring-border">
+    <div className="flex min-w-0 flex-col overflow-hidden rounded-3xl bg-card-background ring-1 ring-border">
       <div
         className="flex h-24 items-end p-4"
         style={{

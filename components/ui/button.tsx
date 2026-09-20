@@ -3,12 +3,12 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "cn"
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-4xl border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-halo disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-danger aria-invalid:ring-3 aria-invalid:ring-danger-halo [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-4xl border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-halo disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-danger-line aria-invalid:ring-3 aria-invalid:ring-danger-halo [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
         default:
-          "bg-action text-action-foreground hover:bg-action-hover active:bg-action-active aria-expanded:bg-action-active aria-pressed:bg-action-active",
+          "bg-action-brand-background text-action-brand-foreground hover:bg-action-brand-hover active:bg-action-brand-active aria-expanded:bg-action-brand-active aria-pressed:bg-action-brand-active",
         outline:
           "border-border bg-background text-foreground hover:bg-action-neutral-hover active:bg-action-neutral-active aria-expanded:bg-action-neutral-active aria-pressed:bg-action-neutral-active",
         field:
@@ -16,8 +16,8 @@ const buttonVariants = cva(
         ghost:
           "text-foreground hover:bg-action-neutral-hover active:bg-action-neutral-active aria-expanded:bg-action-neutral-active aria-pressed:bg-action-neutral-active",
         destructive:
-          "bg-action-destructive text-action-destructive-foreground hover:bg-action-destructive-hover active:bg-action-destructive-active aria-expanded:bg-action-destructive-active aria-pressed:bg-action-destructive-active",
-        link: "text-action underline-offset-4 hover:underline",
+          "bg-action-destructive-background text-action-destructive-foreground hover:bg-action-destructive-hover active:bg-action-destructive-active aria-expanded:bg-action-destructive-active aria-pressed:bg-action-destructive-active",
+        link: "text-action-brand-background underline-offset-4 hover:underline",
       },
       size: {
         default:

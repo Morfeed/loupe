@@ -609,7 +609,7 @@ function SignInCard() {
             <Field>
               <Button type="submit">Sign in</Button>
             </Field>
-            <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
+            <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card-background">
               or
             </FieldSeparator>
             <Field>

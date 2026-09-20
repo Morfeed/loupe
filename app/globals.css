@@ -1,46 +1,55 @@
+/* Global tokens: palettes, page surface, roles, status, lines and radius */
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "./components.css";
+@import "./dashboard.css";
 
-@custom-variant dark (&:is(.dark *, .popup-inverted *));
+@custom-variant dark (&:is(.dark *));
 
 @theme static {
   --color-white: oklch(1 0 0);
   --color-black: oklch(0 0 0);
 
-  --color-navy-50: oklch(0.97 0.013 258.4);
-  --color-navy-100: oklch(0.932 0.032 258.4);
-  --color-navy-200: oklch(0.882 0.056 258.4);
-  --color-navy-300: oklch(0.809 0.096 258.4);
-  --color-navy-400: oklch(0.707 0.152 258.4);
-  --color-navy-500: oklch(0.623 0.16 258.4);
-  --color-navy-600: oklch(0.546 0.16 258.4);
-  --color-navy-700: oklch(0.488 0.152 258.4);
-  --color-navy-800: oklch(0.424 0.136 258.4);
-  --color-navy-900: oklch(0.379 0.138 258.4);
-  --color-navy-950: oklch(0.282 0.096 258.4);
+  --color-azure-50: oklch(0.97 0.014 260.3);
+  --color-azure-100: oklch(0.932 0.033 260.3);
+  --color-azure-150: oklch(0.907 0.0455 260.3);
+  --color-azure-200: oklch(0.882 0.058 260.3);
+  --color-azure-250: oklch(0.8455 0.077 260.3);
+  --color-azure-300: oklch(0.809 0.096 260.3);
+  --color-azure-350: oklch(0.758 0.1245 260.3);
+  --color-azure-400: oklch(0.707 0.153 260.3);
+  --color-azure-450: oklch(0.665 0.1785 260.3);
+  --color-azure-500: oklch(0.623 0.204 260.3);
+  --color-azure-550: oklch(0.5845 0.2279 260.3);
+  --color-azure-600: oklch(0.57103 0.23622 260.256);
+  --color-azure-650: oklch(0.517 0.214 260.3);
+  --color-azure-700: oklch(0.488 0.202 260.3);
+  --color-azure-750: oklch(0.456 0.189 260.3);
+  --color-azure-800: oklch(0.424 0.176 260.3);
+  --color-azure-850: oklch(0.4015 0.1665 260.3);
+  --color-azure-900: oklch(0.379 0.157 260.3);
+  --color-azure-950: oklch(0.282 0.118 260.3);
 
-  --color-aqua-50: oklch(0.97 0.014 211.1);
-  --color-aqua-100: oklch(0.932 0.042 211.1);
-  --color-aqua-200: oklch(0.882 0.06 211.1);
-  --color-aqua-300: oklch(0.809 0.09 211.1);
-  --color-aqua-400: oklch(0.707 0.114 211.1);
-  --color-aqua-500: oklch(0.623 0.108 211.1);
-  --color-aqua-600: oklch(0.546 0.094 211.1);
-  --color-aqua-700: oklch(0.488 0.084 211.1);
-  --color-aqua-800: oklch(0.424 0.072 211.1);
-  --color-aqua-900: oklch(0.379 0.064 211.1);
-  --color-aqua-950: oklch(0.282 0.048 211.1);
-
+  --color-graphite-25: oklch(0.985 0 0);
   --color-graphite-50: oklch(0.97 0 0);
   --color-graphite-100: oklch(0.932 0 0);
+  --color-graphite-150: oklch(0.907 0 0);
   --color-graphite-200: oklch(0.882 0 0);
+  --color-graphite-250: oklch(0.8455 0 0);
   --color-graphite-300: oklch(0.809 0 0);
+  --color-graphite-350: oklch(0.758 0 0);
   --color-graphite-400: oklch(0.707 0 0);
+  --color-graphite-450: oklch(0.665 0 0);
   --color-graphite-500: oklch(0.623 0 0);
+  --color-graphite-550: oklch(0.5845 0 0);
   --color-graphite-600: oklch(0.546 0 0);
+  --color-graphite-650: oklch(0.517 0 0);
   --color-graphite-700: oklch(0.488 0 0);
+  --color-graphite-750: oklch(0.456 0 0);
   --color-graphite-800: oklch(0.424 0 0);
+  --color-graphite-850: oklch(0.4015 0 0);
   --color-graphite-900: oklch(0.379 0 0);
   --color-graphite-925: oklch(0.33 0 0);
   --color-graphite-950: oklch(0.282 0 0);
@@ -52,78 +61,53 @@
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);
 
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-
-  --color-tabs: var(--tabs);
-
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-
-  --color-overlay: var(--overlay);
-  --color-thumb: var(--thumb);
-  --color-field: var(--field);
   --color-halo: var(--halo);
   --color-ring: var(--ring);
   --color-border: var(--border);
 
   --color-warning-subtle: var(--warning-subtle);
+  --color-warning-line: var(--warning-line);
   --color-warning-foreground: var(--warning-foreground);
-  --color-warning: var(--warning);
+  --color-warning-background: var(--warning-background);
 
   --color-danger-subtle: var(--danger-subtle);
+  --color-danger-line: var(--danger-line);
   --color-danger-halo: var(--danger-halo);
   --color-danger-foreground: var(--danger-foreground);
-  --color-danger: var(--danger);
+  --color-danger-background: var(--danger-background);
 
   --color-info-subtle: var(--info-subtle);
+  --color-info-line: var(--info-line);
   --color-info-foreground: var(--info-foreground);
-  --color-info: var(--info);
+  --color-info-background: var(--info-background);
 
   --color-success-subtle: var(--success-subtle);
+  --color-success-line: var(--success-line);
   --color-success-foreground: var(--success-foreground);
-  --color-success: var(--success);
+  --color-success-background: var(--success-background);
 
   --color-action-destructive-active: var(--action-destructive-active);
   --color-action-destructive-hover: var(--action-destructive-hover);
   --color-action-destructive-foreground: var(--action-destructive-foreground);
-  --color-action-destructive: var(--action-destructive);
+  --color-action-destructive-background: var(--action-destructive-background);
 
   --color-action-neutral-active: var(--action-neutral-active);
   --color-action-neutral-hover: var(--action-neutral-hover);
-  --color-action-neutral: var(--action-neutral);
+  --color-action-neutral-background: var(--action-neutral-background);
 
-  --color-action-active: var(--action-active);
-  --color-action-hover: var(--action-hover);
-  --color-action-subtle: var(--action-subtle);
-  --color-action-foreground: var(--action-foreground);
-  --color-action: var(--action);
-
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
+  --color-action-brand-active: var(--action-brand-active);
+  --color-action-brand-hover: var(--action-brand-hover);
+  --color-action-brand-subtle: var(--action-brand-subtle);
+  --color-action-brand-foreground: var(--action-brand-foreground);
+  --color-action-brand-background: var(--action-brand-background);
 
   --color-neutral-subtle: var(--neutral-subtle);
   --color-neutral-foreground: var(--neutral-foreground);
-  --color-neutral: var(--neutral);
+  --color-neutral-background: var(--neutral-background);
 
   --color-brand-subtle: var(--brand-subtle);
   --color-brand-foreground: var(--brand-foreground);
-  --color-brand: var(--brand);
-
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
+  --color-brand-background: var(--brand-background);
 
   --color-foreground: var(--foreground);
   --color-background: var(--background);
@@ -139,152 +123,110 @@
 
 :root {
   --background: var(--color-white);
-  --foreground: var(--color-neutral-950);
-  --card: var(--color-white);
-  --card-foreground: var(--color-neutral-950);
-  --popover: var(--color-white);
-  --popover-foreground: var(--color-neutral-950);
+  --foreground: var(--color-graphite-950);
 
-  --brand: var(--color-navy-800);
+  --brand-background: var(--color-azure-600);
   --brand-foreground: var(--color-white);
-  --brand-subtle: var(--color-navy-50);
+  --brand-subtle: var(--color-azure-50);
 
-  --neutral: var(--color-neutral-200);
-  --neutral-foreground: var(--color-neutral-700);
-  --neutral-subtle: var(--color-neutral-100);
+  --neutral-background: var(--color-graphite-100);
+  --neutral-foreground: var(--color-graphite-700);
+  --neutral-subtle: var(--color-graphite-50);
 
-  --accent: var(--color-aqua-100);
-  --accent-foreground: var(--color-navy-800);
-  --accent-subtle: var(--color-aqua-50);
+  --action-brand-background: var(--color-azure-600);
+  --action-brand-foreground: var(--color-white);
+  --action-brand-hover: var(--color-azure-700);
+  --action-brand-active: var(--color-azure-600);
+  --action-brand-subtle: var(--color-azure-50);
 
-  --action: var(--color-navy-700);
-  --action-foreground: var(--color-white);
-  --action-hover: var(--color-navy-800);
-  --action-active: var(--color-navy-700);
-  --action-subtle: var(--color-navy-50);
+  --action-neutral-background: var(--color-graphite-50);
+  --action-neutral-hover: var(--color-graphite-100);
+  --action-neutral-active: var(--color-graphite-50);
 
-  --action-neutral: var(--color-neutral-100);
-  --action-neutral-hover: var(--color-neutral-200);
-  --action-neutral-active: var(--color-neutral-100);
-
-  --action-destructive: var(--color-red-100);
+  --action-destructive-background: var(--color-red-100);
   --action-destructive-foreground: var(--color-red-900);
   --action-destructive-hover: var(--color-red-200);
   --action-destructive-active: var(--color-red-100);
 
-  --success: var(--color-green-700);
+  --success-background: var(--color-green-700);
   --success-foreground: var(--color-white);
+  --success-line: var(--color-green-700);
   --success-subtle: var(--color-green-50);
 
-  --info: var(--color-blue-600);
+  --info-background: var(--color-blue-600);
   --info-foreground: var(--color-white);
+  --info-line: var(--color-blue-600);
   --info-subtle: var(--color-blue-50);
 
-  --danger: var(--color-red-600);
+  --danger-background: var(--color-red-600);
   --danger-foreground: var(--color-white);
   --danger-halo: var(--color-red-200);
+  --danger-line: var(--color-red-600);
   --danger-subtle: var(--color-red-50);
 
-  --warning: var(--color-yellow-400);
+  --warning-background: var(--color-yellow-400);
   --warning-foreground: var(--color-yellow-950);
+  --warning-line: var(--color-yellow-400);
   --warning-subtle: var(--color-yellow-50);
 
-  --border: var(--color-neutral-200);
-  --field: var(--color-neutral-100);
-  --ring: var(--color-navy-500);
-  --halo: var(--color-navy-200);
-  --thumb: var(--color-white);
-  --overlay: color-mix(in oklch, var(--color-black) 30%, transparent);
-
-  --chart-1: var(--color-navy-300);
-  --chart-2: var(--color-navy-500);
-  --chart-3: var(--color-navy-600);
-  --chart-4: var(--color-navy-700);
-  --chart-5: var(--color-navy-800);
+  --border: var(--color-graphite-200);
+  --ring: var(--color-azure-500);
+  --halo: var(--color-azure-200);
 
   --radius: 0.625rem;
-  --control-dot: 0.5rem;
-
-  --sidebar: var(--color-neutral-50);
-  --sidebar-foreground: var(--color-neutral-950);
-  --sidebar-primary: var(--brand);
-  --sidebar-primary-foreground: var(--brand-foreground);
-  --sidebar-accent: var(--neutral);
-  --sidebar-accent-foreground: var(--color-neutral-900);
-  --sidebar-border: var(--color-neutral-200);
-  --sidebar-ring: var(--color-navy-500);
-
-  --tabs: var(--color-white);
 }
 
-/* .popup-inverted is an always-dark theme scope, so popups don't need `dark` */
-.dark,
-.popup-inverted {
+.dark {
   --background: var(--color-graphite-975);
   --foreground: var(--color-graphite-100);
-  --card: var(--color-graphite-950);
-  --card-foreground: var(--color-graphite-100);
-  --popover: var(--color-graphite-950);
-  --popover-foreground: var(--color-graphite-100);
 
-  --brand: var(--color-navy-400);
-  --brand-foreground: var(--color-navy-950);
-  --brand-subtle: var(--color-navy-950);
+  --brand-background: var(--color-azure-400);
+  --brand-foreground: var(--color-azure-950);
+  --brand-subtle: var(--color-azure-950);
 
-  --neutral: var(--color-graphite-925);
+  --neutral-background: var(--color-graphite-925);
   --neutral-foreground: var(--color-graphite-300);
   --neutral-subtle: var(--color-graphite-950);
 
-  --accent: var(--color-aqua-700);
-  --accent-foreground: var(--color-aqua-100);
+  --action-brand-background: var(--color-azure-400);
+  --action-brand-foreground: var(--color-azure-950);
+  --action-brand-hover: var(--color-azure-300);
+  --action-brand-active: var(--color-azure-400);
+  --action-brand-subtle: var(--color-azure-950);
 
-  --action: var(--color-navy-400);
-  --action-foreground: var(--color-navy-950);
-  --action-hover: var(--color-navy-300);
-  --action-active: var(--color-navy-400);
-  --action-subtle: var(--color-navy-950);
-
-  --action-neutral: var(--color-graphite-925);
+  --action-neutral-background: var(--color-graphite-985);
   --action-neutral-hover: var(--color-graphite-900);
   --action-neutral-active: var(--color-graphite-925);
 
-  --action-destructive: var(--color-red-900);
+  --action-destructive-background: var(--color-red-900);
   --action-destructive-foreground: var(--color-red-100);
   --action-destructive-hover: var(--color-red-800);
   --action-destructive-active: var(--color-red-900);
 
-  --success: var(--color-green-400);
+  --success-background: var(--color-green-400);
   --success-foreground: var(--color-green-950);
+  --success-line: var(--color-green-400);
   --success-subtle: var(--color-green-950);
 
-  --info: var(--color-blue-300);
+  --info-background: var(--color-blue-300);
   --info-foreground: var(--color-blue-950);
+  --info-line: var(--color-blue-300);
   --info-subtle: var(--color-blue-950);
 
-  --danger: var(--color-red-400);
+  --danger-background: var(--color-red-400);
   --danger-foreground: var(--color-red-950);
   --danger-halo: var(--color-red-900);
+  --danger-line: var(--color-red-400);
   --danger-subtle: var(--color-red-950);
 
-  --warning: var(--color-yellow-400);
+  --warning-background: var(--color-yellow-400);
   --warning-foreground: var(--color-yellow-950);
+  --warning-line: var(--color-yellow-400);
   --warning-subtle: var(--color-yellow-950);
 
   --border: var(--color-graphite-900);
-  --field: var(--color-graphite-925);
-  --ring: var(--color-navy-700);
-  --halo: var(--color-navy-400);
-  --thumb: var(--color-graphite-100);
-
-  --control-dot: 0.625rem;
-
-  --sidebar: var(--color-graphite-985);
-  --sidebar-foreground: var(--color-graphite-100);
-  --sidebar-accent-foreground: var(--color-graphite-100);
-  --sidebar-border: var(--color-graphite-900);
-  --sidebar-ring: var(--color-graphite-600);
-
-  --tabs: var(--color-graphite-800);
+  --ring: var(--color-azure-700);
+  --halo: var(--color-azure-400);
 }
 
 @layer base {
@@ -300,37 +242,5 @@
   }
   html {
     @apply font-sans;
-  }
-}
-
-/* Frosted, always-dark surface for Popover, DropdownMenu and Select, modeled on
-   Command inside a Popover. Components add layout only (size, padding,
-   overflow); surface, radius, item highlight and separators all live here. */
-@utility popup-inverted {
-  @apply relative isolate animate-none! rounded-3xl bg-popover/70 text-popover-foreground shadow-sm ring-1 ring-foreground/10 outline-hidden;
-  @apply before:pointer-events-none before:absolute before:inset-0 before:-z-1 before:rounded-[inherit] before:backdrop-blur-2xl before:backdrop-saturate-150;
-
-  /* Active row: keyboard focus, Base UI highlight, cmdk selection, open submenu */
-  &
-    :is(
-      [data-slot="command-item"],
-      [data-slot="select-item"],
-      [data-slot^="dropdown-menu-"][data-slot$="item"],
-      [data-slot="dropdown-menu-sub-trigger"]
-    ):is(:focus, [data-highlighted], [data-selected="true"], [data-popup-open]) {
-    @apply bg-action-neutral text-foreground;
-
-    & > svg {
-      @apply text-foreground;
-    }
-  }
-
-  &
-    :is(
-      [data-slot="command-separator"],
-      [data-slot="dropdown-menu-separator"],
-      [data-slot="select-separator"]
-    ) {
-    @apply bg-foreground/5;
   }
 }

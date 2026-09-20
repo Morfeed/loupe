@@ -42,11 +42,11 @@ function Toast({ className, ...props }: ToastPrimitive.Root.Props) {
     <ToastPrimitive.Root
       data-slot="toast"
       className={cn(
-        "group/toast pointer-events-auto absolute right-0 bottom-0 z-[calc(1000-var(--toast-index))] w-full origin-bottom rounded-2xl border bg-popover text-popover-foreground shadow-sm will-change-transform outline-none select-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-halo",
-        "data-[type=success]:border-success/30 data-[type=success]:bg-success-subtle data-[type=success]:text-success",
-        "data-[type=info]:border-info/30 data-[type=info]:bg-info-subtle data-[type=info]:text-info",
-        "data-[type=warning]:border-warning/50 data-[type=warning]:bg-warning-subtle",
-        "data-[type=error]:border-danger/30 data-[type=error]:bg-danger-subtle data-[type=error]:text-danger",
+        "group/toast pointer-events-auto absolute right-0 bottom-0 z-[calc(1000-var(--toast-index))] w-full origin-bottom rounded-2xl border bg-dialog-background text-dialog-foreground shadow-sm will-change-transform outline-none select-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-halo",
+        "data-[type=success]:border-success-line/30 data-[type=success]:bg-success-subtle data-[type=success]:text-success-background",
+        "data-[type=info]:border-info-line/30 data-[type=info]:bg-info-subtle data-[type=info]:text-info-background",
+        "data-[type=warning]:border-warning-line/50 data-[type=warning]:bg-warning-subtle",
+        "data-[type=error]:border-danger-line/30 data-[type=error]:bg-danger-subtle data-[type=error]:text-danger-background",
         "[--gap:0.75rem] [--height:var(--toast-frontmost-height,var(--toast-height))] [--offset-y:calc(var(--toast-offset-y)*-1+calc(var(--toast-index)*var(--gap)*-1)+var(--toast-swipe-movement-y))] [--peek:0.75rem] [--scale:calc(max(0,1-(var(--toast-index)*0.1)))] [--shrink:calc(1-var(--scale))]",
         "h-(--height) [transform:translateX(var(--toast-swipe-movement-x))_translateY(calc(var(--toast-swipe-movement-y)-(var(--toast-index)*var(--peek))-(var(--shrink)*var(--height))))_scale(var(--scale))] [transition:transform_500ms_cubic-bezier(0.22,1,0.36,1),opacity_500ms,height_150ms]",
         "after:absolute after:top-full after:left-0 after:h-[calc(var(--gap)+1px)] after:w-full after:content-['']",
@@ -142,10 +142,14 @@ function ToastClose({
 }
 
 const toastIcons: Record<string, React.ReactNode> = {
-  success: <CircleCheckIcon className="text-success" aria-hidden="true" />,
-  info: <InfoIcon className="text-info" aria-hidden="true" />,
-  warning: <TriangleAlertIcon className="text-warning" aria-hidden="true" />,
-  error: <OctagonXIcon className="text-danger" aria-hidden="true" />,
+  success: (
+    <CircleCheckIcon className="text-success-background" aria-hidden="true" />
+  ),
+  info: <InfoIcon className="text-info-background" aria-hidden="true" />,
+  warning: (
+    <TriangleAlertIcon className="text-warning-background" aria-hidden="true" />
+  ),
+  error: <OctagonXIcon className="text-danger-background" aria-hidden="true" />,
   loading: (
     <Loader2Icon
       className="animate-spin text-neutral-foreground"

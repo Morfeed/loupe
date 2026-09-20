@@ -17,7 +17,7 @@ export function RadiusShowcase() {
       {radii.map((radius) => (
         <div key={radius} className="flex flex-col gap-3">
           <div
-            className={`aspect-[4/3] border-2 border-brand bg-brand-subtle ${radius}`}
+            className={`aspect-[4/3] border-2 border-brand-background bg-brand-subtle ${radius}`}
           />
           <code className="font-mono text-xs font-medium">{radius}</code>
         </div>

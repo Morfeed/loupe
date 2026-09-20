@@ -104,7 +104,7 @@ export function TabsShowcase() {
             className="w-full gap-6"
           >
             <TabsList>
-              <TabsTrigger value="models" className="data-active:bg-tabs">
+              <TabsTrigger value="models">
                 <CpuIcon />
                 Models
               </TabsTrigger>

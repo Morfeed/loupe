@@ -44,7 +44,7 @@ function AlertDialogExample({ size }: { size: "default" | "sm" }) {
       <AlertDialogContent size={size}>
         <AlertDialogHeader>
           {isSmall ? (
-            <AlertDialogMedia className="bg-danger-subtle text-danger">
+            <AlertDialogMedia className="bg-danger-subtle text-danger-background">
               <Trash2Icon />
             </AlertDialogMedia>
           ) : null}

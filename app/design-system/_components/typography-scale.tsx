@@ -101,7 +101,7 @@ const textStyles = [
   {
     name: "Error",
     source: "FieldError",
-    className: "text-sm text-danger",
+    className: "text-sm text-danger-background",
     sample: "This API key was rejected by the provider.",
   },
   {
@@ -119,7 +119,8 @@ const textStyles = [
   {
     name: "Link",
     source: "Button variant=link",
-    className: "text-sm font-medium text-action underline underline-offset-4",
+    className:
+      "text-sm font-medium text-action-brand-background underline underline-offset-4",
     sample: "Review hidden posts",
   },
 ]
@@ -131,7 +132,7 @@ export function TypographyScale() {
         {fontFamilies.map((font) => (
           <div
             key={font.name}
-            className="flex flex-col gap-6 rounded-3xl bg-card p-6 ring-1 ring-border"
+            className="flex flex-col gap-6 rounded-3xl bg-card-background p-6 ring-1 ring-border"
           >
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">{font.name}</span>

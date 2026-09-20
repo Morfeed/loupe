@@ -52,7 +52,7 @@ function FieldGroup({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 const fieldVariants = cva(
-  "group/field flex w-full gap-3 data-[invalid=true]:text-danger",
+  "group/field flex w-full gap-3 data-[invalid=true]:text-danger-background",
   {
     variants: {
       orientation: {
@@ -106,7 +106,7 @@ function FieldLabel({
     <Label
       data-slot="field-label"
       className={cn(
-        "group/field-label peer/field-label flex w-fit gap-2 leading-snug group-data-[disabled=true]/field:opacity-50 has-[>[data-slot=field]]:rounded-2xl has-[>[data-slot=field]]:border has-[>[data-slot=field]]:border-border has-[>[data-slot=field]]:transition-colors has-[>[data-slot=field]]:not-has-[:disabled,[data-disabled],[data-checked]]:hover:bg-action-neutral has-[>[data-slot=field]]:has-[:focus-visible]:border-ring has-[>[data-slot=field]]:has-[:focus-visible]:ring-3 has-[>[data-slot=field]]:has-[:focus-visible]:ring-halo has-[>[data-slot=field]]:has-aria-invalid:border-danger has-[>[data-slot=field]]:has-data-checked:border-action has-[>[data-slot=field]]:has-data-checked:bg-action-subtle has-[>[data-slot=field]]:has-data-disabled:cursor-not-allowed has-[>[data-slot=field]]:has-data-disabled:opacity-50 *:data-[slot=field]:p-4",
+        "group/field-label peer/field-label flex w-fit gap-2 leading-snug group-data-[disabled=true]/field:opacity-50 has-[>[data-slot=field]]:rounded-2xl has-[>[data-slot=field]]:border has-[>[data-slot=field]]:border-border has-[>[data-slot=field]]:transition-colors has-[>[data-slot=field]]:not-has-[:disabled,[data-disabled],[data-checked]]:hover:bg-action-neutral-background has-[>[data-slot=field]]:has-aria-invalid:border-danger-line has-[>[data-slot=field]]:has-data-checked:border-action-brand-background has-[>[data-slot=field]]:has-data-checked:bg-action-brand-subtle has-[>[data-slot=field]]:has-data-disabled:cursor-not-allowed has-[>[data-slot=field]]:has-data-disabled:opacity-50 has-[>[data-slot=field]]:has-[:focus-visible]:border-ring has-[>[data-slot=field]]:has-[:focus-visible]:ring-3 has-[>[data-slot=field]]:has-[:focus-visible]:ring-halo *:data-[slot=field]:p-4",
         "has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col",
         className
       )}
@@ -135,7 +135,7 @@ function FieldDescription({ className, ...props }: React.ComponentProps<"p">) {
       className={cn(
         "text-left text-sm leading-normal font-normal text-neutral-foreground group-has-data-horizontal/field:text-balance [[data-variant=legend]+&]:-mt-1.5",
         "last:mt-0 nth-last-2:-mt-1",
-        "[&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-action",
+        "[&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-action-brand-background",
         className
       )}
       {...props}
@@ -216,7 +216,7 @@ function FieldError({
     <div
       role="alert"
       data-slot="field-error"
-      className={cn("text-sm font-normal text-danger", className)}
+      className={cn("text-sm font-normal text-danger-background", className)}
       {...props}
     >
       {content}

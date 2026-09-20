@@ -1,3 +1,5 @@
+/* Rewrite shadcn color tokens to the project tokens after a shadcn add */
+
 import { readFileSync, readdirSync, statSync, writeFileSync } from "node:fs"
 import { extname, join } from "node:path"
 
@@ -26,16 +28,22 @@ const utilityPrefixes = [
   "placeholder",
 ]
 
+/* A background token carries the -background suffix so the utility class and the
+   CSS variable share one name. */
 const tokenRenames = [
-  ["primary-foreground", "action-foreground"],
-  ["primary", "action"],
+  ["primary-foreground", "action-brand-foreground"],
+  ["primary", "action-brand-background"],
   ["secondary-foreground", "neutral-foreground"],
-  ["secondary", "neutral"],
+  ["secondary", "neutral-background"],
   ["muted-foreground", "neutral-foreground"],
-  ["muted", "neutral"],
+  ["muted", "neutral-background"],
   ["accent-foreground", "foreground"],
-  ["accent", "action-neutral"],
-  ["destructive", "danger"],
+  ["accent", "action-neutral-background"],
+  ["destructive", "danger-background"],
+  ["card", "card-background"],
+  ["popover", "popover-background"],
+  ["sidebar-accent", "sidebar-accent-background"],
+  ["sidebar", "sidebar-background"],
 ]
 
 const prefixPattern = utilityPrefixes

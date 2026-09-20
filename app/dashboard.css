@@ -1,0 +1,13 @@
+/* Dashboard tokens */
+
+@theme inline {
+  --color-dashboard-background: var(--dashboard-background);
+}
+
+:root {
+  --dashboard-background: var(--color-graphite-25);
+}
+
+.dark {
+  --dashboard-background: var(--color-graphite-985);
+}
