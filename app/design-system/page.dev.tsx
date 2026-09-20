@@ -75,7 +75,7 @@ export default function DesignSystemPage() {
           your social feeds straight from the page and filters out toxicity,
           bots, AI slop and topics you never asked for. Everything below is
           rendered as it ships in components/ui. Press{" "}
-          <kbd className="rounded-md border bg-neutral px-1.5 font-mono text-xs">
+          <kbd className="rounded-md border bg-neutral-background px-1.5 font-mono text-xs">
             d
           </kbd>{" "}
           to toggle the theme.
