@@ -5,11 +5,16 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:extension": "npm --prefix extension run dev",
     "build": "next build",
+    "build:extension": "npm --prefix extension run build",
     "start": "next start",
     "lint": "eslint",
+    "lint:extension": "eslint extension --max-warnings=0",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
-    "typecheck": "tsc --noEmit"
+    "test:extension": "npm --prefix extension run test",
+    "typecheck": "tsc --noEmit",
+    "typecheck:extension": "npm --prefix extension run typecheck"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",
