@@ -1,7 +1,7 @@
 import { browser } from "wxt/browser";
-import { DEFAULT_STATE, STORAGE_KEY } from "./constants";
+import { DEFAULT_STATE, PROVIDER_KINDS, STORAGE_KEY } from "./constants";
 import { sanitizeRules } from "./rules";
-import type { ProviderSettings, StoredState } from "./types";
+import type { ProviderKind, ProviderSettings, StoredState } from "./types";
 
 interface PersistedProvider {
   kind?: string;
@@ -13,10 +13,14 @@ type PersistedState = Omit<Partial<StoredState>, "provider"> & {
   provider?: PersistedProvider;
 };
 
+export function isProviderKind(kind: unknown): kind is ProviderKind {
+  return PROVIDER_KINDS.includes(kind as ProviderKind);
+}
+
 function loadProvider(provider: PersistedProvider | undefined): ProviderSettings {
-  if (provider?.kind !== "groq") return structuredClone(DEFAULT_STATE.provider);
+  if (!isProviderKind(provider?.kind)) return structuredClone(DEFAULT_STATE.provider);
   return {
-    kind: "groq",
+    kind: provider.kind,
     apiKey: provider.apiKey ?? "",
     verified: provider.verified ?? false,
   };
@@ -25,11 +29,10 @@ function loadProvider(provider: PersistedProvider | undefined): ProviderSettings
 export async function loadState(): Promise<StoredState> {
   const stored = (await browser.storage.local.get(STORAGE_KEY))[STORAGE_KEY] as PersistedState | undefined;
   if (!stored) return structuredClone(DEFAULT_STATE);
-  const isGroqState = stored.provider?.kind === "groq";
 
   return {
     enabled: stored.enabled ?? DEFAULT_STATE.enabled,
-    cloudConsent: isGroqState ? (stored.cloudConsent ?? DEFAULT_STATE.cloudConsent) : false,
+    cloudConsent: isProviderKind(stored.provider?.kind) ? (stored.cloudConsent ?? DEFAULT_STATE.cloudConsent) : false,
     rules: sanitizeRules(stored.rules),
     provider: loadProvider(stored.provider),
   };
@@ -40,5 +43,5 @@ export async function saveState(state: StoredState): Promise<void> {
 }
 
 export function hasReadyProvider(state: StoredState): boolean {
-  return state.provider.kind === "groq" && Boolean(state.provider.apiKey && state.provider.verified);
+  return isProviderKind(state.provider.kind) && Boolean(state.provider.apiKey && state.provider.verified);
 }

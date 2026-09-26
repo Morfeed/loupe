@@ -38,13 +38,13 @@ Users can reveal its explanation or dismiss that match for the current tab.
 ### Provider
 
 The replaceable boundary through which Morfeed requests rule evaluations. The
-MVP provider calls `openai/gpt-oss-20b` through GroqCloud; future providers may
-run locally through WebLLM.
+user selects one MVP provider: `openai/gpt-oss-20b` through GroqCloud or
+`jev-latest` through TypeSafe. Future providers may run locally through WebLLM.
 
 ### Analysis batch
 
-Up to five feed items evaluated against every enabled rule in one provider
-request. Morfeed processes no more than two analysis batches concurrently.
+Up to five feed items evaluated against every enabled rule. GroqCloud receives
+the batch as one request; TypeSafe receives one request per feed item. Morfeed processes no more than two analysis batches concurrently.
 
 ### Dogfood MVP
 

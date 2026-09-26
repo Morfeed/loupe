@@ -13,6 +13,7 @@ export default defineConfig({
     host_permissions: [
       "https://www.reddit.com/*",
       "https://api.groq.com/*",
+      "https://api.typesafe.ai/*",
     ],
     action: {
       default_title: "Morfeed",

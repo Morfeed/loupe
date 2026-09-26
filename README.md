@@ -36,7 +36,8 @@ npm run build:extension
 
 Load `extension/.output/chrome-mv3` as an unpacked extension from
 `chrome://extensions` with Developer mode enabled. Open the extension settings,
-enter a Groq API key, then use **Save & test**. Rules can then be added from the
+choose a model (GroqCloud `openai/gpt-oss-20b` or TypeSafe `jev-latest`), enter
+that provider's API key, then use **Save & test**. Rules can then be added from the
 popup while browsing modern Reddit post listings.
 
 Useful commands:

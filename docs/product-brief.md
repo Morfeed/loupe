@@ -31,7 +31,8 @@ decision brings them into scope.
 
 The MVP will use one hosted text model to reach the dogfood loop quickly. The
 provider boundary must remain small enough to replace that provider with
-in-browser WebLLM later, but the MVP will not implement multiple providers.
+in-browser WebLLM later. The MVP lets the user select one of two hosted
+providers (see ADR 0006).
 Because feed text leaves the browser in this phase, the interface must disclose
 when cloud analysis is active and must never bundle a shared production API key.
 
@@ -109,7 +110,8 @@ credentials and at least one enabled rule, Morfeed starts automatically on a
 supported Reddit listing. The popup reports `Setup required`, `Ready`,
 `Analyzing`, `Paused`, or `Error` and always shows a `Cloud` indicator while the
 MVP uses hosted inference. Before analysis is enabled for the first time, the
-user must acknowledge that visible post content will be sent to GroqCloud.
+user must acknowledge that visible post content will be sent to the selected
+provider. Changing the provider requires that acknowledgment again.
 
 Rules apply to every supported Reddit post listing; subreddit-specific scope is
 deferred. A rule name is required and limited to 40 characters, its criterion is
@@ -127,8 +129,8 @@ contrast.
 The Reddit adapter supports only modern desktop post listings at
 `https://www.reddit.com/*`. Old Reddit, mobile layouts, comment threads, search
 results, and embedded posts are outside the MVP. The extension requests only
-storage access plus host access to the supported Reddit origin and configured
-GroqCloud API endpoint.
+storage access plus host access to the supported Reddit origin and the GroqCloud
+and TypeSafe API endpoints.
 
 Each matching post receives a small, style-isolated Morfeed marker row near the
 beginning of its card. The marker uses normal document flow rather than absolute

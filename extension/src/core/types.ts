@@ -16,8 +16,18 @@ export interface Rule {
   color: RuleColor;
 }
 
+export type ProviderKind = "groq" | "typesafe";
+
+export interface ProviderInfo {
+  label: string;
+  model: string;
+  keyUrl: string;
+  keyPlaceholder: string;
+  note: string;
+}
+
 export interface ProviderSettings {
-  kind: "groq";
+  kind: ProviderKind;
   apiKey: string;
   verified: boolean;
 }

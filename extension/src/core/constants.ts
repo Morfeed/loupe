@@ -1,7 +1,26 @@
-import type { RuleColor, StoredState } from "./types";
+import type { ProviderInfo, ProviderKind, RuleColor, StoredState } from "./types";
 
 export const STORAGE_KEY = "morfeed-state";
-export const MODEL_ID = "openai/gpt-oss-20b";
+
+export const PROVIDERS: Record<ProviderKind, ProviderInfo> = {
+  groq: {
+    label: "GroqCloud",
+    model: "openai/gpt-oss-20b",
+    keyUrl: "https://console.groq.com/keys",
+    keyPlaceholder: "gsk_…",
+    note: "Groq’s free-tier limits can change. Morfeed does not enable paid billing on your account.",
+  },
+  typesafe: {
+    label: "TypeSafe",
+    model: "jev-latest",
+    keyUrl: "https://console.typesafe.ai/keys",
+    keyPlaceholder: "TypeSafe API key",
+    note: "TypeSafe bills your account for input tokens. Jev returns a match probability, so markers show no reason.",
+  },
+};
+
+export const PROVIDER_KINDS = Object.keys(PROVIDERS) as ProviderKind[];
+
 export const MAX_RULES = 8;
 export const MAX_POST_LENGTH = 4_000;
 export const MAX_BATCH_SIZE = 5;

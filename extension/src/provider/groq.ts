@@ -1,19 +1,10 @@
-import { MODEL_ID } from "../core/constants";
-import type { FeedItem, MatchResult, ProviderSettings, Rule } from "../core/types";
+import { PROVIDERS } from "../core/constants";
+import type { FeedItem, MatchResult, Rule } from "../core/types";
+import { isTransientStatus, ProviderError, withRetries } from "./shared";
 
 interface ChatCompletion {
   choices?: Array<{ message?: { content?: string } }>;
   error?: { message?: string; code?: string };
-}
-
-export class ProviderError extends Error {
-  constructor(
-    message: string,
-    readonly transient = false,
-  ) {
-    super(message);
-    this.name = "ProviderError";
-  }
 }
 
 export function providerEndpoint(): string {
@@ -78,19 +69,15 @@ export function parseResults(content: string, items: FeedItem[], rules: Rule[]):
   return results;
 }
 
-async function requestOnce(
-  provider: ProviderSettings,
-  items: FeedItem[],
-  rules: Rule[],
-): Promise<MatchResult[]> {
+async function requestOnce(apiKey: string, items: FeedItem[], rules: Rule[]): Promise<MatchResult[]> {
   const response = await fetch(providerEndpoint(), {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${provider.apiKey.trim()}`,
+      Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: MODEL_ID,
+      model: PROVIDERS.groq.model,
       messages: [
         {
           role: "system",
@@ -109,7 +96,7 @@ async function requestOnce(
   if (!response.ok) {
     const detail = payload.error?.message?.slice(0, 240);
     const code = payload.error?.code ? ` (${payload.error.code})` : "";
-    throw new ProviderError(detail ? `${detail}${code}` : `Groq returned HTTP ${response.status}.`, response.status === 429 || response.status >= 500);
+    throw new ProviderError(detail ? `${detail}${code}` : `Groq returned HTTP ${response.status}.`, isTransientStatus(response.status));
   }
 
   const content = payload.choices?.[0]?.message?.content;
@@ -117,28 +104,6 @@ async function requestOnce(
   return parseResults(content, items, rules);
 }
 
-export async function analyzePosts(
-  provider: ProviderSettings,
-  items: FeedItem[],
-  rules: Rule[],
-): Promise<MatchResult[]> {
-  let lastError: unknown;
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    try {
-      return await requestOnce(provider, items, rules);
-    } catch (error) {
-      lastError = error;
-      if (!(error instanceof ProviderError) || !error.transient || attempt === 2) throw error;
-      await new Promise((resolve) => setTimeout(resolve, 400 * 2 ** attempt));
-    }
-  }
-  throw lastError;
-}
-
-export async function testProvider(provider: ProviderSettings): Promise<void> {
-  await analyzePosts(
-    provider,
-    [{ postId: "connection-test", title: "Morfeed connection test", body: "", subreddit: "morfeed" }],
-    [{ id: "connection-rule", name: "Connection", criterion: "Match this connection test", enabled: true, color: "#3b82f6" }],
-  );
+export function analyzePosts(apiKey: string, items: FeedItem[], rules: Rule[]): Promise<MatchResult[]> {
+  return withRetries(() => requestOnce(apiKey, items, rules));
 }

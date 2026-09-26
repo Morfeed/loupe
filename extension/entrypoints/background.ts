@@ -2,7 +2,7 @@ import { browser } from "wxt/browser";
 import type { Runtime } from "wxt/browser";
 import { loadState, hasReadyProvider } from "../src/core/storage";
 import type { ContentState, ExtensionMessage, ExtensionResponse, StoredState, TabStatus } from "../src/core/types";
-import { analyzePosts, testProvider } from "../src/provider/groq";
+import { analyzePosts, testProvider } from "../src/provider";
 
 const tabStatuses = new Map<number, TabStatus>();
 
@@ -43,7 +43,7 @@ export default defineBackground(() => {
         await testProvider(message.provider);
         return { ok: true };
       } catch (error) {
-        return { ok: false, error: error instanceof Error ? error.message : "Could not connect to Groq." };
+        return { ok: false, error: error instanceof Error ? error.message : "Could not connect to the provider." };
       }
     }
 
@@ -75,7 +75,7 @@ export default defineBackground(() => {
     try {
       const state = await loadState();
       if (!state.enabled) return { ok: false, error: "Morfeed is paused." };
-      if (!state.cloudConsent || !hasReadyProvider(state)) return { ok: false, error: "Groq setup is required." };
+      if (!state.cloudConsent || !hasReadyProvider(state)) return { ok: false, error: "Provider setup is required." };
       if (tabId !== undefined) tabStatuses.set(tabId, { status: "analyzing" });
       const results = await analyzePosts(state.provider, message.items, message.rules);
       if (tabId !== undefined) tabStatuses.set(tabId, { status: "ready" });

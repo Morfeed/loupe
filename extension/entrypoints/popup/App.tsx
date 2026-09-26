@@ -5,7 +5,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Switch } from "../../components/ui/switch";
 import { Textarea } from "../../components/ui/textarea";
-import { MAX_RULES, RULE_COLORS } from "../../src/core/constants";
+import { MAX_RULES, PROVIDERS, RULE_COLORS } from "../../src/core/constants";
 import { createRule, moveRule } from "../../src/core/rules";
 import { hasReadyProvider, loadState, saveState } from "../../src/core/storage";
 import type { ExtensionMessage, ExtensionResponse, Rule, StoredState, TabStatus } from "../../src/core/types";
@@ -44,6 +44,7 @@ export function App() {
   }
 
   if (!state) return <main className="w-[390px] p-4 text-sm">Loading…</main>;
+  const providerLabel = PROVIDERS[state.provider.kind].label;
 
   return (
     <main className="w-[390px] max-h-[600px] overflow-y-auto">
@@ -75,14 +76,14 @@ export function App() {
       <section className="space-y-3 p-4">
         {!state.cloudConsent && (
           <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-950 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-100">
-            <p>Morfeed sends visible post text, the subreddit, and your enabled rules to GroqCloud for analysis.</p>
+            <p>Morfeed sends visible post text, the subreddit, and your enabled rules to {providerLabel} for analysis.</p>
             <Button className="mt-3" size="sm" onClick={() => void commit({ ...state, cloudConsent: true })}>Allow cloud analysis</Button>
           </div>
         )}
 
         {!hasReadyProvider(state) && (
           <button className="w-full rounded-lg border border-amber-300 bg-amber-50 p-3 text-left text-xs text-amber-950 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100" onClick={() => void browser.runtime.openOptionsPage()}>
-            Add and verify your Groq API key to start.
+            Add and verify your {providerLabel} API key to start.
           </button>
         )}
 
