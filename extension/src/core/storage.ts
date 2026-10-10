@@ -1,4 +1,5 @@
 import { browser } from "wxt/browser";
+import { loadHistorySettings } from "../history/settings";
 import { DEFAULT_STATE, PROVIDER_KINDS, STORAGE_KEY } from "./constants";
 import { sanitizeRules } from "./rules";
 import type { ProviderKind, ProviderSettings, StoredState } from "./types";
@@ -35,6 +36,7 @@ export async function loadState(): Promise<StoredState> {
     cloudConsent: isProviderKind(stored.provider?.kind) ? (stored.cloudConsent ?? DEFAULT_STATE.cloudConsent) : false,
     rules: sanitizeRules(stored.rules),
     provider: loadProvider(stored.provider),
+    history: loadHistorySettings(stored.history),
   };
 }
 

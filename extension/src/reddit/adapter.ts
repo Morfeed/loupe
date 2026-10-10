@@ -1,6 +1,6 @@
 import { MAX_POST_LENGTH } from "../core/constants";
 import { contentFingerprint } from "../core/batch";
-import type { FeedItem } from "../core/types";
+import type { RedditFeedItem, SiteAdapter } from "../core/types";
 
 const POST_SELECTOR = "shreddit-post, article[data-testid='post-container'], div[data-testid='post-container']";
 
@@ -33,7 +33,7 @@ export function findPostElements(root: ParentNode): HTMLElement[] {
   return [...found];
 }
 
-export function extractFeedItem(element: HTMLElement): FeedItem | null {
+export function extractFeedItem(element: HTMLElement): RedditFeedItem | null {
   const title = (
     attributeFrom(element, ["post-title", "data-title"]) ||
     textFrom(element, ["[slot='title']", "[data-testid='post-title']", "h1", "h2", "h3"])
@@ -60,9 +60,15 @@ export function extractFeedItem(element: HTMLElement): FeedItem | null {
     redditId ||
     `local-${contentFingerprint(`${subreddit}\n${title}\n${body}`)}`;
 
-  return { postId, title, body, subreddit };
+  return { site: "reddit", postId, subreddit, title, body };
 }
 
-export function feedItemFingerprint(item: FeedItem): string {
-  return contentFingerprint(`${item.subreddit}\n${item.title}\n${item.body}`);
-}
+export const redditAdapter: SiteAdapter<RedditFeedItem> = {
+  isSupportedPage: isSupportedRedditFeed,
+  findItemElements: findPostElements,
+  closestItemElement: (node) => (node instanceof Element ? node : node.parentElement)?.closest<HTMLElement>(POST_SELECTOR) ?? null,
+  extractFeedItem,
+  markerPlacement: "start",
+  /* shreddit-post draws its action bar in shadow DOM, so only hiding the host hides the whole post */
+  hideTarget: "item",
+};

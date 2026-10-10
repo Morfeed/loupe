@@ -1,12 +1,12 @@
-import { RedditController } from "../src/reddit/controller";
-import { isSupportedRedditFeed } from "../src/reddit/adapter";
+import { FeedController } from "../src/feed/controller";
+import { redditAdapter } from "../src/reddit/adapter";
 
 export default defineContentScript({
   matches: ["https://www.reddit.com/*"],
   runAt: "document_idle",
   async main() {
-    if (!isSupportedRedditFeed(window.location)) return;
-    const controller = new RedditController();
+    if (!redditAdapter.isSupportedPage(window.location)) return;
+    const controller = new FeedController(redditAdapter);
     await controller.start();
   },
 });

@@ -7,16 +7,17 @@ export default defineConfig({
     plugins: [tailwindcss()],
   }),
   manifest: {
-    name: "Morfeed",
-    description: "Highlight Reddit posts that match your rules with AI.",
-    permissions: ["storage", "tabs"],
+    name: "Loupe",
+    description: "Mark, hide, or remove Reddit posts and YouTube videos that match your rules with AI.",
+    permissions: ["storage", "tabs", "unlimitedStorage"],
     host_permissions: [
       "https://www.reddit.com/*",
+      "https://www.youtube.com/*",
       "https://api.groq.com/*",
       "https://api.typesafe.ai/*",
     ],
     action: {
-      default_title: "Morfeed",
+      default_title: "Loupe",
     },
   },
 });

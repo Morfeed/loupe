@@ -1,3 +1,5 @@
+import type { FeedItem } from "./types";
+
 export function chunk<T>(items: T[], size: number): T[][] {
   const chunks: T[][] = [];
   for (let index = 0; index < items.length; index += size) {
@@ -13,4 +15,8 @@ export function contentFingerprint(value: string): string {
     hash = Math.imul(hash, 16777619);
   }
   return (hash >>> 0).toString(36);
+}
+
+export function feedItemFingerprint(item: FeedItem): string {
+  return contentFingerprint(JSON.stringify(item));
 }

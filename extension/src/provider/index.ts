@@ -17,7 +17,7 @@ export function analyzePosts(provider: ProviderSettings, items: FeedItem[], rule
 export async function testProvider(provider: ProviderSettings): Promise<void> {
   await analyzePosts(
     provider,
-    [{ postId: "connection-test", title: "Morfeed connection test", body: "", subreddit: "morfeed" }],
-    [{ id: "connection-rule", name: "Connection", criterion: "Match this connection test", enabled: true, color: "#3b82f6" }],
+    [{ site: "reddit", postId: "connection-test", subreddit: "loupe", title: "Loupe connection test", body: "" }],
+    [{ id: "connection-rule", name: "Connection", criterion: "Match this connection test", enabled: true, color: "#3b82f6", action: "mark" }],
   );
 }

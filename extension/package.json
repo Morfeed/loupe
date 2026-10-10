@@ -1,5 +1,5 @@
 {
-  "name": "@morfeed/extension",
+  "name": "@loupe/extension",
   "version": "0.0.1",
   "private": true,
   "type": "module",
@@ -11,8 +11,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "idb": "^8.0.4",
+    "loupe": "file:..",
     "lucide-react": "^1.45.0",
-    "morfeed": "file:..",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
@@ -22,6 +23,7 @@
     "@types/react-dom": "19.1.9",
     "@vitejs/plugin-react": "4.4.1",
     "@wxt-dev/module-react": "1.1.3",
+    "fake-indexeddb": "^6.2.5",
     "jsdom": "26.1.0",
     "tailwindcss": "4.1.14",
     "typescript": "5.9.2",

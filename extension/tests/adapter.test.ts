@@ -11,6 +11,7 @@ describe("Reddit adapter", () => {
     const posts = findPostElements(document);
     expect(posts).toHaveLength(2);
     expect(extractFeedItem(posts[0]!)).toEqual({
+      site: "reddit",
       postId: "t3_alpha",
       title: "A frontend role",
       body: "We are hiring a React engineer in Toronto.",

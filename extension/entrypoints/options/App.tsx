@@ -58,9 +58,9 @@ export function App() {
   return (
     <main className="mx-auto max-w-2xl p-6 sm:p-10">
       <div className="mb-8">
-        <p className="text-sm font-medium text-blue-600">Morfeed</p>
+        <p className="text-sm font-medium text-blue-600">Loupe</p>
         <h1 className="mt-1 text-2xl font-bold">Model settings</h1>
-        <p className="mt-2 text-sm text-zinc-500">Credentials are stored in Chrome’s local extension storage and used only by Morfeed’s background worker.</p>
+        <p className="mt-2 text-sm text-zinc-500">Credentials are stored in Chrome’s local extension storage and used only by Loupe’s background worker.</p>
       </div>
 
       <form className="space-y-5 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950" onSubmit={(event) => void submit(event)}>

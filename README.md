@@ -1,6 +1,6 @@
-# Morfeed
+# Loupe
 
-Morfeed is a local-first browser extension concept for finding useful signal in
+Loupe is a local-first browser extension concept for finding useful signal in
 social-media feeds. It analyzes content already visible in the browser so users
 can filter noise, collect structured information, and summarize conversations
 without needing platform API keys or separate scraping infrastructure.
@@ -38,7 +38,7 @@ Load `extension/.output/chrome-mv3` as an unpacked extension from
 `chrome://extensions` with Developer mode enabled. Open the extension settings,
 choose a model (GroqCloud `openai/gpt-oss-20b` or TypeSafe `jev-latest`), enter
 that provider's API key, then use **Save & test**. Rules can then be added from the
-popup while browsing modern Reddit post listings.
+popup while browsing modern Reddit post listings or YouTube video listings.
 
 Useful commands:
 

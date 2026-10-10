@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loupe Architecture</title>
+<meta name="description" content="How the Loupe browser extension and website are structured: runtime contexts, analysis pipeline, adapters, providers, storage, and privacy boundaries.">
+<style>
+/* Loupe architecture overview. Self-contained: no external fonts, scripts, or images. */
+:root {
+  color-scheme: light dark;
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --surface-2: #f4f4f5;
+  --text: #18181b;
+  --muted: #5f5f68;
+  --border: #e4e4e7;
+  --accent: #2563eb;
+  --accent-soft: #dbeafe;
+  --accent-text: #1e40af;
+  --page: #fef3c7;
+  --page-border: #d97706;
+  --ext: #e0f2fe;
+  --ext-border: #0284c7;
+  --cloud: #fce7f3;
+  --cloud-border: #db2777;
+  --store: #dcfce7;
+  --store-border: #16a34a;
+  --code-bg: #f4f4f5;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 4px 16px rgb(0 0 0 / 0.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c0c0e;
+    --surface: #151518;
+    --surface-2: #1d1d21;
+    --text: #f4f4f5;
+    --muted: #a1a1aa;
+    --border: #2e2e33;
+    --accent: #60a5fa;
+    --accent-soft: #172554;
+    --accent-text: #bfdbfe;
+    --page: #2a1f08;
+    --page-border: #f59e0b;
+    --ext: #0b2433;
+    --ext-border: #38bdf8;
+    --cloud: #2d0f1f;
+    --cloud-border: #f472b6;
+    --store: #0b2615;
+    --store-border: #4ade80;
+    --code-bg: #1d1d21;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c0c0e;
+  --surface: #151518;
+  --surface-2: #1d1d21;
+  --text: #f4f4f5;
+  --muted: #a1a1aa;
+  --border: #2e2e33;
+  --accent: #60a5fa;
+  --accent-soft: #172554;
+  --accent-text: #bfdbfe;
+  --page: #2a1f08;
+  --page-border: #f59e0b;
+  --ext: #0b2433;
+  --ext-border: #38bdf8;
+  --cloud: #2d0f1f;
+  --cloud-border: #f472b6;
+  --store: #0b2615;
+  --store-border: #4ade80;
+  --code-bg: #1d1d21;
+  --shadow: none;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 24px; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+code, pre, kbd { font-family: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace; font-size: 0.88em; }
+code { background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 4px; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 14px 16px; border-radius: 8px; overflow-x: auto; line-height: 1.5; margin: 16px 0; }
+pre code { background: none; padding: 0; font-size: 0.85rem; }
+a { color: var(--accent); }
+h1, h2, h3 { line-height: 1.25; text-wrap: balance; }
+h1 { font-size: clamp(2rem, 5vw, 2.75rem); margin: 0 0 12px; letter-spacing: -0.02em; }
+h2 { font-size: 1.5rem; margin: 0 0 12px; letter-spacing: -0.01em; }
+h3 { font-size: 1.05rem; margin: 28px 0 8px; }
+p { margin: 0 0 14px; }
+ul, ol { padding-left: 1.3em; margin: 0 0 14px; }
+li { margin: 4px 0; }
+
+.layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 48px; max-width: 1240px; margin: 0 auto; padding: 48px 32px 96px; }
+nav.toc { position: sticky; top: 24px; align-self: start; max-height: calc(100vh - 48px); overflow-y: auto; font-size: 0.875rem; }
+nav.toc .brand { font-weight: 700; margin-bottom: 12px; display: block; color: var(--text); text-decoration: none; }
+nav.toc ol { list-style: none; padding: 0; margin: 0; counter-reset: toc; }
+nav.toc li { margin: 0; counter-increment: toc; }
+nav.toc a { display: block; padding: 4px 10px; color: var(--muted); text-decoration: none; border-left: 2px solid var(--border); }
+nav.toc li a::before { content: counter(toc) ". "; opacity: 0.6; }
+nav.toc a:hover, nav.toc a.active { color: var(--text); border-left-color: var(--accent); }
+main { min-width: 0; }
+
+header.hero { margin-bottom: 40px; }
+.lede { font-size: 1.15rem; color: var(--muted); max-width: 70ch; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.pill { font-size: 0.78rem; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); }
+
+section { padding: 36px 0; border-top: 1px solid var(--border); }
+section > p, section > ul, section > ol { max-width: 75ch; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: 18px 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; box-shadow: var(--shadow); }
+.card h3 { margin: 0 0 6px; font-size: 1rem; }
+.card p { margin: 0; color: var(--muted); font-size: 0.92rem; }
+.card .tag { display: inline-block; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+.tag.page { color: var(--page-border); }
+.tag.ext { color: var(--ext-border); }
+.tag.cloud { color: var(--cloud-border); }
+.tag.store { color: var(--store-border); }
+
+.callout { border-left: 3px solid var(--accent); background: var(--accent-soft); color: var(--accent-text); padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 18px 0; max-width: 75ch; }
+.callout p:last-child { margin: 0; }
+.callout strong { color: inherit; }
+
+.table-wrap { overflow-x: auto; margin: 16px 0; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { background: var(--surface-2); font-weight: 600; white-space: nowrap; }
+tr:last-child td { border-bottom: 0; }
+td code { white-space: nowrap; }
+
+figure { margin: 20px 0; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); }
+figure .scroll { overflow-x: auto; }
+figure svg { display: block; width: 100%; min-width: 720px; height: auto; }
+figcaption { font-size: 0.85rem; color: var(--muted); margin-top: 10px; }
+
+.steps { counter-reset: step; list-style: none; padding: 0; margin: 18px 0; display: grid; gap: 10px; max-width: none; }
+.steps li { counter-increment: step; position: relative; margin: 0; padding: 12px 16px 12px 52px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+.steps li::before { content: counter(step); position: absolute; left: 14px; top: 12px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent-text); font-weight: 700; font-size: 0.8rem; display: grid; place-items: center; }
+.steps li strong { display: block; }
+.steps li span { color: var(--muted); font-size: 0.92rem; }
+
+.tree { font-size: 0.82rem; }
+.tree .c { color: var(--muted); }
+
+/* SVG diagram tokens */
+.d-text { fill: var(--text); font: 13px ui-sans-serif, system-ui, sans-serif; }
+.d-title { fill: var(--text); font: 600 14px ui-sans-serif, system-ui, sans-serif; }
+.d-small { fill: var(--muted); font: 11.5px ui-sans-serif, system-ui, sans-serif; }
+.d-mono { fill: var(--text); font: 11.5px ui-monospace, Consolas, monospace; }
+.d-zone-page { fill: var(--page); stroke: var(--page-border); }
+.d-zone-ext { fill: var(--ext); stroke: var(--ext-border); }
+.d-zone-cloud { fill: var(--cloud); stroke: var(--cloud-border); }
+.d-zone-store { fill: var(--store); stroke: var(--store-border); }
+.d-box { fill: var(--surface); stroke: var(--border); }
+.d-line { stroke: var(--muted); stroke-width: 1.5; fill: none; }
+.d-life { stroke: var(--border); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.d-arrow { fill: var(--muted); }
+.d-dash { stroke-dasharray: 5 4; }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; gap: 0; padding: 28px 16px 72px; }
+  nav.toc { position: static; max-height: none; margin-bottom: 24px; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+  nav.toc ol { columns: 2; column-gap: 12px; }
+}
+@media (max-width: 480px) {
+  nav.toc ol { columns: 1; }
+  th, td { padding: 8px 10px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="toc" aria-label="Contents">
+    <a class="brand" href="#top">Loupe architecture</a>
+    <ol>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#repo">Repository layout</a></li>
+      <li><a href="#runtime">Extension runtime</a></li>
+      <li><a href="#modules">Module layers</a></li>
+      <li><a href="#pipeline">Analysis pipeline</a></li>
+      <li><a href="#messages">Message protocol</a></li>
+      <li><a href="#state">State and storage</a></li>
+      <li><a href="#adapters">Site adapters</a></li>
+      <li><a href="#providers">Model providers</a></li>
+      <li><a href="#markers">Markers</a></li>
+      <li><a href="#invalidation">Caching and re-analysis</a></li>
+      <li><a href="#privacy">Privacy and failure</a></li>
+      <li><a href="#limits">Limits</a></li>
+      <li><a href="#website">Website</a></li>
+      <li><a href="#quality">Testing and tooling</a></li>
+      <li><a href="#adrs">Decision records</a></li>
+      <li><a href="#future">Deferred work</a></li>
+    </ol>
+  </nav>
+
+  <main id="top">
+    <header class="hero">
+      <h1>Loupe architecture</h1>
+      <p class="lede">Loupe is a local-first browser extension that reads social-feed content already rendered in the page, checks each item against user-written rules with a language model, and marks matches inline. This page explains how the code is put together and why.</p>
+      <div class="meta">
+        <span class="pill">Chrome MV3 · WXT 0.19</span>
+        <span class="pill">React 19 · TypeScript · Tailwind 4</span>
+        <span class="pill">Reddit + YouTube adapters</span>
+        <span class="pill">GroqCloud / TypeSafe providers</span>
+        <span class="pill">Next.js 16 website</span>
+      </div>
+    </header>
+
+    <section id="overview">
+      <h2>1. Overview</h2>
+      <p>The repository holds two separate build targets that share a name and a design language but no runtime code:</p>
+      <div class="cards">
+        <div class="card">
+          <span class="tag ext">Product</span>
+          <h3>Browser extension <code>extension/</code></h3>
+          <p>A dogfood-quality, unpacked Chrome Manifest V3 extension built with WXT. It highlights Reddit posts and YouTube videos that match the user's rules.</p>
+        </div>
+        <div class="card">
+          <span class="tag page">Marketing</span>
+          <h3>Website <code>/</code> (repo root)</h3>
+          <p>A Next.js 16 App Router site with waitlist hero variants and a dev-only design-system showcase.</p>
+        </div>
+      </div>
+      <p>The extension's core loop is <strong>passive filtering</strong>: as the user scrolls, newly visible feed items are extracted, batched, sent to the selected model provider together with the enabled rules, and matching items receive a colored outline and a badge. Structured collections and on-demand summarization are part of the product vision but are not built yet.</p>
+      <div class="callout">
+        <p><strong>Sources of truth.</strong> <code>docs/product-brief.md</code> defines scope, <code>CONTEXT.md</code> defines the domain vocabulary (feed item, adapter, enrichment, rule, match, marker, provider, analysis batch), and <code>docs/adr/</code> records settled decisions. This page describes how the code implements them.</p>
+      </div>
+    </section>
+
+    <section id="repo">
+      <h2>2. Repository layout</h2>
+<pre class="tree"><code>loupe/
+├─ app/                     <span class="c">Next.js App Router website</span>
+│  ├─ page.tsx              <span class="c">starter landing page</span>
+│  ├─ hero/[variant]/       <span class="c">waitlist heroes: /hero/1 (vintage), /hero/2 (aero)</span>
+│  └─ design-system/        <span class="c">token and component showcase, dev server only</span>
+├─ components/ui/           <span class="c">shadcn/ui components for the website</span>
+├─ lib/  hooks/             <span class="c">website utilities (cn, oklch, use-mobile)</span>
+├─ scripts/migrate-tokens.mjs
+├─ docs/
+│  ├─ product-brief.md      <span class="c">canonical product scope</span>
+│  ├─ adr/0001…0007         <span class="c">architecture decision records</span>
+│  └─ architecture.html     <span class="c">this page</span>
+├─ CONTEXT.md               <span class="c">domain glossary</span>
+├─ AGENTS.md                <span class="c">contributor and agent instructions</span>
+└─ extension/               <span class="c">WXT extension, its own package.json and lockfile</span>
+   ├─ wxt.config.ts         <span class="c">manifest: name, permissions, host permissions</span>
+   ├─ entrypoints/
+   │  ├─ background.ts      <span class="c">service worker: message router, provider calls</span>
+   │  ├─ reddit.content.ts  <span class="c">content script for www.reddit.com</span>
+   │  ├─ youtube.content.ts <span class="c">content script for www.youtube.com</span>
+   │  ├─ popup/             <span class="c">React popup: rules, pause, status, consent</span>
+   │  └─ options/           <span class="c">React options page: provider and API key</span>
+   ├─ src/
+   │  ├─ core/              <span class="c">types, constants, rules, storage, fingerprints</span>
+   │  ├─ feed/              <span class="c">site-independent FeedController and marker</span>
+   │  ├─ reddit/            <span class="c">Reddit SiteAdapter</span>
+   │  ├─ youtube/           <span class="c">YouTube SiteAdapter and InnerTube metadata</span>
+   │  └─ provider/          <span class="c">Groq, TypeSafe, retry policy, dispatch</span>
+   ├─ components/ui/        <span class="c">extension copies of button, input, switch, textarea</span>
+   └─ tests/                <span class="c">Vitest + jsdom, HTML fixtures for both sites</span></code></pre>
+      <p>Root <code>package.json</code> scripts proxy into the extension package (<code>dev:extension</code>, <code>build:extension</code>, <code>test:extension</code>, <code>typecheck:extension</code>, <code>lint:extension</code>), so day-to-day work runs from the repo root.</p>
+    </section>
+
+    <section id="runtime">
+      <h2>3. Extension runtime</h2>
+      <p>A Chrome extension runs as several isolated JavaScript contexts that talk only through message passing and shared extension storage. Loupe uses four of them, and their trust levels drive most of the design.</p>
+
+      <figure>
+        <div class="scroll">
+        <svg viewBox="0 0 960 540" role="img" aria-labelledby="rt-title rt-desc">
+          <title id="rt-title">Extension runtime contexts</title>
+          <desc id="rt-desc">The content script runs inside the Reddit or YouTube page and talks to the background service worker through runtime messages. The popup and options pages read and write chrome.storage.local. The background worker calls GroqCloud or TypeSafe. The YouTube adapter calls the InnerTube player endpoint.</desc>
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="d-arrow"/></marker>
+          </defs>
+
+          <rect x="20" y="30" width="290" height="390" rx="12" class="d-zone-page" stroke-width="1.5"/>
+          <text x="36" y="56" class="d-title">Web page (untrusted)</text>
+          <text x="36" y="74" class="d-small">www.reddit.com · www.youtube.com</text>
+
+          <rect x="40" y="90" width="250" height="52" rx="8" class="d-box"/>
+          <text x="56" y="113" class="d-text">Site DOM</text>
+          <text x="56" y="131" class="d-small">posts, video tiles, infinite scroll</text>
+
+          <rect x="40" y="178" width="250" height="226" rx="10" class="d-zone-ext" stroke-width="1.5"/>
+          <text x="56" y="200" class="d-title">Content script</text>
+          <rect x="56" y="214" width="218" height="54" rx="7" class="d-box"/>
+          <text x="70" y="236" class="d-text">FeedController</text>
+          <text x="70" y="254" class="d-small">observe · queue · batch · render</text>
+          <rect x="56" y="278" width="218" height="54" rx="7" class="d-box"/>
+          <text x="70" y="300" class="d-text">SiteAdapter</text>
+          <text x="70" y="318" class="d-small">find · extract · enrich</text>
+          <rect x="56" y="342" width="218" height="48" rx="7" class="d-box"/>
+          <text x="70" y="363" class="d-text">Marker</text>
+          <text x="70" y="380" class="d-small">shadow DOM badge row + outline</text>
+
+          <path d="M175 142 L175 176" class="d-line" marker-start="url(#ah)" marker-end="url(#ah)"/>
+          <text x="184" y="164" class="d-small">observe / inject</text>
+
+          <rect x="20" y="460" width="290" height="62" rx="10" class="d-zone-cloud d-dash" stroke-width="1.5"/>
+          <text x="36" y="485" class="d-title">YouTube InnerTube</text>
+          <text x="36" y="505" class="d-mono">POST /youtubei/v1/player</text>
+          <path d="M175 404 L175 458" class="d-line" marker-end="url(#ah)"/>
+          <text x="184" y="436" class="d-small">enrich, credentials: omit</text>
+
+          <rect x="400" y="30" width="250" height="110" rx="12" class="d-zone-ext" stroke-width="1.5"/>
+          <text x="416" y="54" class="d-title">Extension pages (trusted)</text>
+          <rect x="416" y="68" width="104" height="56" rx="7" class="d-box"/>
+          <text x="430" y="92" class="d-text">Popup</text>
+          <text x="430" y="110" class="d-small">rules, pause</text>
+          <rect x="530" y="68" width="104" height="56" rx="7" class="d-box"/>
+          <text x="544" y="92" class="d-text">Options</text>
+          <text x="544" y="110" class="d-small">provider, key</text>
+
+          <rect x="400" y="190" width="250" height="200" rx="12" class="d-zone-ext" stroke-width="1.5"/>
+          <text x="416" y="214" class="d-title">Background service worker</text>
+          <text x="416" y="232" class="d-small">trusted · holds the API key at call time</text>
+          <rect x="416" y="246" width="218" height="38" rx="7" class="d-box"/>
+          <text x="430" y="270" class="d-text">Message router</text>
+          <rect x="416" y="292" width="218" height="38" rx="7" class="d-box"/>
+          <text x="430" y="316" class="d-text">Tab status map (memory)</text>
+          <rect x="416" y="338" width="218" height="38" rx="7" class="d-box"/>
+          <text x="430" y="362" class="d-text">Provider dispatch + retries</text>
+
+          <path d="M525 140 L525 188" class="d-line" marker-end="url(#ah)"/>
+          <text x="517" y="156" text-anchor="end" class="d-mono">TEST_PROVIDER</text>
+          <text x="517" y="170" text-anchor="end" class="d-mono">GET_TAB_STATUS</text>
+          <text x="517" y="184" text-anchor="end" class="d-mono">CLEAR_MARKERS</text>
+
+          <path d="M290 240 L398 240" class="d-line" marker-end="url(#ah)"/>
+          <text x="298" y="232" class="d-mono">ANALYZE_POSTS</text>
+          <path d="M398 300 L290 300" class="d-line" marker-end="url(#ah)"/>
+          <text x="298" y="292" class="d-mono">STATE_UPDATED</text>
+          <text x="298" y="318" class="d-small">sanitized, no key</text>
+
+          <rect x="720" y="30" width="220" height="110" rx="12" class="d-zone-store" stroke-width="1.5"/>
+          <text x="736" y="56" class="d-title">chrome.storage.local</text>
+          <text x="736" y="76" class="d-mono">"loupe-state"</text>
+          <text x="736" y="98" class="d-small">rules, enabled, consent,</text>
+          <text x="736" y="114" class="d-small">provider kind + API key</text>
+          <text x="736" y="130" class="d-small">TRUSTED_CONTEXTS only</text>
+
+          <path d="M650 86 L718 86" class="d-line" marker-start="url(#ah)" marker-end="url(#ah)"/>
+          <text x="656" y="78" class="d-small">read/write</text>
+          <path d="M650 214 C690 214 700 160 760 142" class="d-line" marker-start="url(#ah)"/>
+          <text x="745" y="176" class="d-small">loadState</text>
+          <text x="745" y="190" class="d-small">onChanged</text>
+
+          <rect x="720" y="230" width="220" height="220" rx="12" class="d-zone-cloud" stroke-width="1.5"/>
+          <text x="736" y="254" class="d-title">Hosted model (user's key)</text>
+          <rect x="736" y="268" width="188" height="72" rx="7" class="d-box"/>
+          <text x="750" y="292" class="d-text">GroqCloud</text>
+          <text x="750" y="310" class="d-mono">openai/gpt-oss-20b</text>
+          <text x="750" y="328" class="d-small">one request per batch</text>
+          <rect x="736" y="356" width="188" height="72" rx="7" class="d-box"/>
+          <text x="750" y="380" class="d-text">TypeSafe</text>
+          <text x="750" y="398" class="d-mono">jev-latest</text>
+          <text x="750" y="416" class="d-small">one request per item</text>
+          <path d="M650 357 L718 348" class="d-line" marker-end="url(#ah)"/>
+          <text x="656" y="380" class="d-small">fetch</text>
+          <text x="656" y="394" class="d-small">HTTPS</text>
+        </svg>
+        </div>
+        <figcaption>Yellow is the untrusted page, blue is extension code, green is persistent storage, pink is a network service outside the browser.</figcaption>
+      </figure>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Context</th><th>File</th><th>Responsibilities</th><th>Can see API key?</th></tr></thead>
+          <tbody>
+            <tr><td>Content script</td><td><code>entrypoints/reddit.content.ts</code><br><code>entrypoints/youtube.content.ts</code></td><td>Builds a <code>FeedController</code> around one site adapter. Observes the DOM, extracts feed items, sends analysis requests, renders markers.</td><td>No. Receives a sanitized <code>ContentState</code>.</td></tr>
+            <tr><td>Background worker</td><td><code>entrypoints/background.ts</code></td><td>Routes messages, re-checks enabled/consent/provider state before every analysis, calls the provider, tracks per-tab status, broadcasts state changes to open feed tabs.</td><td>Yes. Reads it from storage per request.</td></tr>
+            <tr><td>Popup</td><td><code>entrypoints/popup/App.tsx</code></td><td>Rule editor (name, criterion, color, order, enabled), master switch, cloud consent, status line, "Clear markers on this tab".</td><td>Reads full state from storage but never displays the key.</td></tr>
+            <tr><td>Options page</td><td><code>entrypoints/options/App.tsx</code></td><td>Provider selection and API key entry with "Save &amp; test". Saves only after the background worker verifies the key.</td><td>Yes, it is where the key is entered.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Why the key stays out of the content script</h3>
+      <p>Content scripts share the page's DOM and run next to untrusted page code. The background worker calls <code>storage.local.setAccessLevel({ accessLevel: "TRUSTED_CONTEXTS" })</code> so content scripts cannot read storage directly. They get rules and flags through the <code>GET_CONTENT_STATE</code> and <code>STATE_UPDATED</code> messages instead, and the <code>contentState()</code> helper replaces the provider object with a single <code>providerReady</code> boolean.</p>
+
+      <h3>Manifest</h3>
+      <p><code>wxt.config.ts</code> requests only <code>storage</code> and <code>tabs</code>, plus host access to <code>www.reddit.com</code>, <code>www.youtube.com</code>, <code>api.groq.com</code>, and <code>api.typesafe.ai</code>. The <code>tabs</code> permission lets the background worker find open feed tabs to broadcast state and identify the active tab for status and marker clearing.</p>
+    </section>
+
+    <section id="modules">
+      <h2>4. Module layers</h2>
+      <p>The extension source is split so that site-specific DOM code, platform-independent feed logic, and model providers can change independently. Dependencies point downward only.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Layer</th><th>Modules</th><th>Depends on</th><th>Must not contain</th></tr></thead>
+          <tbody>
+            <tr><td>Entrypoints</td><td><code>entrypoints/*</code></td><td>Everything below</td><td>Business logic beyond wiring and UI</td></tr>
+            <tr><td>Feed</td><td><code>src/feed/controller.ts</code>, <code>src/feed/marker.ts</code></td><td><code>core</code> and the <code>SiteAdapter</code> interface</td><td>Site selectors, provider calls</td></tr>
+            <tr><td>Site adapters</td><td><code>src/reddit/adapter.ts</code>, <code>src/youtube/adapter.ts</code>, <code>src/youtube/metadata.ts</code></td><td><code>core</code></td><td>Rule evaluation, provider logic</td></tr>
+            <tr><td>Providers</td><td><code>src/provider/index.ts</code>, <code>groq.ts</code>, <code>typesafe.ts</code>, <code>shared.ts</code></td><td><code>core</code></td><td>DOM access, storage access</td></tr>
+            <tr><td>Core</td><td><code>src/core/types.ts</code>, <code>constants.ts</code>, <code>rules.ts</code>, <code>storage.ts</code>, <code>batch.ts</code>, <code>cn.ts</code></td><td>WXT browser API (storage only)</td><td>Anything site- or provider-specific</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The seam that makes a second platform cheap is the <code>SiteAdapter</code> interface in <code>src/core/types.ts</code>. Adding YouTube required a new adapter and a short content script; <code>FeedController</code> did not change shape.</p>
+<pre><code>interface SiteAdapter&lt;T extends FeedItem&gt; {
+  isSupportedPage(location: Location | URL): boolean;
+  findItemElements(root: ParentNode): HTMLElement[];
+  closestItemElement(node: Node): HTMLElement | null;
+  extractFeedItem(element: HTMLElement): T | null;
+  enrichFeedItem?(item: T): Promise&lt;T&gt;;   /* must fail open */
+  markerPlacement: "start" | "end";
+}</code></pre>
+      <p>The provider seam is a single function type, <code>(apiKey, items, rules) =&gt; Promise&lt;MatchResult[]&gt;</code>, keyed by <code>ProviderKind</code> in <code>src/provider/index.ts</code>. A future in-browser WebLLM provider plugs in at the same place.</p>
+    </section>
+
+    <section id="pipeline">
+      <h2>5. Analysis pipeline</h2>
+      <p>From a post appearing on screen to a marker being drawn, every step lives in <code>FeedController</code> unless noted.</p>
+      <ol class="steps">
+        <li><strong>Discover</strong><span>On start, <code>adapter.findItemElements(document)</code> finds existing items. A <code>MutationObserver</code> on <code>document.body</code> (child list, subtree, <code>href</code> attribute) finds items added by infinite scroll or client-side navigation.</span></li>
+        <li><strong>Wait for proximity</strong><span>Each item element is registered with an <code>IntersectionObserver</code> using <code>rootMargin: "600px 0px"</code>. Only elements inside or near the viewport are enqueued, so off-screen content costs nothing.</span></li>
+        <li><strong>Gate</strong><span>Enqueue stops if the page is unsupported, Loupe is paused, consent is missing, the provider is not verified, or no enabled rule has a criterion.</span></li>
+        <li><strong>Extract and deduplicate</strong><span><code>adapter.extractFeedItem(element)</code> produces a plain-data <code>FeedItem</code>. The key <code>fnv1a(item) + ":" + rulesFingerprint</code> is compared with the <code>processed</code> map. A hit re-renders the cached result without a model call.</span></li>
+        <li><strong>Debounce and batch</strong><span>New items join the queue. A 100 ms timer then drains it into batches of at most 5 items with at most 2 batches in flight.</span></li>
+        <li><strong>Enrich</strong><span>If the adapter defines <code>enrichFeedItem</code> (YouTube only), each item is enriched in parallel. Failures return the original item.</span></li>
+        <li><strong>Analyze</strong><span>The content script sends <code>ANALYZE_POSTS { items, rules }</code>. The background worker loads state again, rejects the call if paused or not ready, marks the tab <em>analyzing</em>, and dispatches to the selected provider.</span></li>
+        <li><strong>Validate</strong><span>Providers return exactly one <code>MatchResult</code> per item/rule pair. Malformed, missing, duplicate, or unexpected results throw, and the whole batch fails open.</span></li>
+        <li><strong>Discard stale responses</strong><span>If the rules changed while the request was in flight (fingerprint mismatch) or the page is no longer supported, results are dropped. If an element now shows a different item, its marker is not drawn.</span></li>
+        <li><strong>Render</strong><span>Results are cached per item in tab memory and passed to <code>renderMarker</code>, which skips matches the user dismissed.</span></li>
+      </ol>
+
+      <figure>
+        <div class="scroll">
+        <svg viewBox="0 0 960 560" role="img" aria-labelledby="sq-title sq-desc">
+          <title id="sq-title">Analysis sequence</title>
+          <desc id="sq-desc">Sequence of calls from the page DOM through FeedController, SiteAdapter, background worker, and provider, then back to a rendered marker.</desc>
+          <defs>
+            <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="d-arrow"/></marker>
+          </defs>
+
+          <rect x="30" y="20" width="130" height="40" rx="8" class="d-zone-page" stroke-width="1.5"/>
+          <text x="95" y="45" text-anchor="middle" class="d-title">Page DOM</text>
+          <rect x="215" y="20" width="150" height="40" rx="8" class="d-zone-ext" stroke-width="1.5"/>
+          <text x="290" y="45" text-anchor="middle" class="d-title">FeedController</text>
+          <rect x="420" y="20" width="130" height="40" rx="8" class="d-zone-ext" stroke-width="1.5"/>
+          <text x="485" y="45" text-anchor="middle" class="d-title">SiteAdapter</text>
+          <rect x="605" y="20" width="140" height="40" rx="8" class="d-zone-ext" stroke-width="1.5"/>
+          <text x="675" y="45" text-anchor="middle" class="d-title">Background</text>
+          <rect x="800" y="20" width="130" height="40" rx="8" class="d-zone-cloud" stroke-width="1.5"/>
+          <text x="865" y="45" text-anchor="middle" class="d-title">Provider</text>
+
+          <line x1="95" y1="60" x2="95" y2="540" class="d-life"/>
+          <line x1="290" y1="60" x2="290" y2="540" class="d-life"/>
+          <line x1="485" y1="60" x2="485" y2="540" class="d-life"/>
+          <line x1="675" y1="60" x2="675" y2="540" class="d-life"/>
+          <line x1="865" y1="60" x2="865" y2="540" class="d-life"/>
+
+          <path d="M95 96 L288 96" class="d-line" marker-end="url(#ah2)"/>
+          <text x="104" y="88" class="d-small">item within 600px of viewport</text>
+
+          <path d="M290 136 L483 136" class="d-line" marker-end="url(#ah2)"/>
+          <text x="300" y="128" class="d-mono">extractFeedItem(el)</text>
+          <path d="M485 166 L292 166" class="d-line d-dash" marker-end="url(#ah2)"/>
+          <text x="300" y="158" class="d-small">FeedItem (plain data)</text>
+
+          <path d="M290 196 h40 v26 h-38" class="d-line" marker-end="url(#ah2)"/>
+          <text x="340" y="207" class="d-small">dedupe by fingerprint,</text>
+          <text x="340" y="221" class="d-small">queue, 100 ms debounce</text>
+
+          <path d="M290 262 L483 262" class="d-line" marker-end="url(#ah2)"/>
+          <text x="300" y="254" class="d-mono">enrichFeedItem?(item)</text>
+          <path d="M485 292 L292 292" class="d-line d-dash" marker-end="url(#ah2)"/>
+          <text x="300" y="284" class="d-small">item, or original on failure</text>
+
+          <path d="M290 332 L673 332" class="d-line" marker-end="url(#ah2)"/>
+          <text x="300" y="324" class="d-mono">ANALYZE_POSTS { items ≤ 5, enabled rules }</text>
+
+          <path d="M675 352 h40 v26 h-38" class="d-line" marker-end="url(#ah2)"/>
+          <text x="724" y="363" class="d-small">check enabled,</text>
+          <text x="724" y="377" class="d-small">consent, key</text>
+          <text x="724" y="391" class="d-small">status: analyzing</text>
+
+          <path d="M675 412 L863 412" class="d-line" marker-end="url(#ah2)"/>
+          <text x="684" y="404" class="d-mono">analyzePosts(...)</text>
+          <path d="M865 442 L677 442" class="d-line d-dash" marker-end="url(#ah2)"/>
+          <text x="684" y="434" class="d-small">validated MatchResult[]</text>
+
+          <path d="M675 482 L292 482" class="d-line d-dash" marker-end="url(#ah2)"/>
+          <text x="500" y="474" class="d-mono">{ ok: true, results }</text>
+
+          <path d="M290 522 L97 522" class="d-line" marker-end="url(#ah2)"/>
+          <text x="110" y="514" class="d-mono">renderMarker(el, …)</text>
+        </svg>
+        </div>
+        <figcaption>Solid arrows are calls or messages. Dashed arrows are return values. The background worker is the only step that touches the API key.</figcaption>
+      </figure>
+    </section>
+
+    <section id="messages">
+      <h2>6. Message protocol</h2>
+      <p>All cross-context communication uses the <code>ExtensionMessage</code> union in <code>src/core/types.ts</code>, and every reply is an <code>ExtensionResponse</code>: <code>{ ok: true, … }</code> or <code>{ ok: false, error }</code>. Senders use <code>satisfies ExtensionMessage</code> so a typo in a message type is a compile error.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Type</th><th>From → to</th><th>Payload</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><code>GET_CONTENT_STATE</code></td><td>Content → background</td><td>none</td><td>Initial sanitized rules and flags when the controller starts.</td></tr>
+            <tr><td><code>STATE_UPDATED</code></td><td>Background → every feed tab</td><td><code>ContentState</code></td><td>Sent on any <code>storage.onChanged</code>. Triggers re-analysis or a color-only re-render.</td></tr>
+            <tr><td><code>ANALYZE_POSTS</code></td><td>Content → background</td><td><code>items</code>, <code>rules</code></td><td>Evaluate one batch. Returns <code>results</code> or an error.</td></tr>
+            <tr><td><code>GET_TAB_STATUS</code></td><td>Popup → background</td><td>none</td><td>Status for the active tab, falling back to setup-required / paused / ready.</td></tr>
+            <tr><td><code>CLEAR_MARKERS</code></td><td>Popup → background → active tab</td><td>none</td><td>Remove all markers and forget results and dismissals in that tab.</td></tr>
+            <tr><td><code>TEST_PROVIDER</code></td><td>Options → background</td><td><code>ProviderSettings</code></td><td>Run one synthetic analysis to verify the key before saving.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="state">
+      <h2>7. State and storage</h2>
+      <p>Only configuration persists. Everything derived from feed content lives in memory and disappears with the tab, so Loupe builds no browsing history.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Data</th><th>Where</th><th>Lifetime</th></tr></thead>
+          <tbody>
+            <tr><td>Rules (id, name, criterion, enabled, color, order), master switch, cloud consent, provider kind, API key, verified flag</td><td><code>chrome.storage.local</code> under <code>"loupe-state"</code></td><td>Persistent until the extension is removed</td></tr>
+            <tr><td>Per-tab status (<code>setup-required</code>, <code>ready</code>, <code>analyzing</code>, <code>paused</code>, <code>error</code>)</td><td>Background <code>tabStatuses</code> map</td><td>Until the tab closes or the worker is suspended</td></tr>
+            <tr><td>Queue, processed fingerprints, match results, dismissals</td><td><code>FeedController</code> fields</td><td>Current page lifetime</td></tr>
+            <tr><td>YouTube video details</td><td><code>metadata.ts</code> module cache, up to 500 entries, failures evicted</td><td>Current page lifetime</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Two shapes of state</h3>
+<pre><code>StoredState  = { enabled, cloudConsent, rules, provider: { kind, apiKey, verified } }
+ContentState = { enabled, cloudConsent, rules, providerReady }   /* sent to pages */</code></pre>
+      <p><code>loadState()</code> in <code>src/core/storage.ts</code> never trusts what is stored: it runs every rule through <code>sanitizeRules()</code> (type checks, length limits, preset colors, max 8 rules), resets an unknown provider kind to the default, and drops consent if the provider kind is invalid. Consent is also reset when the user verifies a different provider, because consent names the service that receives the data.</p>
+      <p>The popup and options page write storage directly with <code>saveState()</code>. The background worker listens to <code>storage.onChanged</code> and broadcasts the new <code>ContentState</code>, so storage is the single event source for configuration changes.</p>
+    </section>
+
+    <section id="adapters">
+      <h2>8. Site adapters</h2>
+      <p>An adapter is the only code that knows a site's markup. It turns a DOM element into a <code>FeedItem</code> that contains only what the model needs.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th>Reddit</th><th>YouTube</th></tr></thead>
+          <tbody>
+            <tr><td>Supported pages</td><td>Modern desktop listings on <code>www.reddit.com</code>. Paths with <code>comments</code>, <code>search</code>, or <code>submit</code> are excluded.</td><td>Any <code>www.youtube.com</code> page: home, subscriptions, search, channels, playlists, watch-page recommendations, Shorts tiles.</td></tr>
+            <tr><td>Item selector</td><td><code>shreddit-post</code> plus legacy <code>post-container</code> fallbacks</td><td>Eight tile renderers (<code>ytd-rich-item-renderer</code>, <code>yt-lockup-view-model</code>, Shorts lockups, …). Only the outermost tile counts, because new lockups nest inside old renderers.</td></tr>
+            <tr><td>Feed item ID</td><td><code>post-id</code> attribute, then permalink ID, then a content hash</td><td>The 11-character video ID from a <code>/watch?v=</code> or <code>/shorts/</code> link</td></tr>
+            <tr><td>Fields sent</td><td><code>subreddit</code>, <code>title</code>, <code>body</code> (title + body ≤ 4,000 chars)</td><td><code>title</code>, <code>channel</code>, <code>isShort</code>; after enrichment also <code>description</code> (≤ 1,000), <code>keywords</code> (≤ 20), <code>category</code>, <code>durationSeconds</code>, <code>publishDate</code>, <code>isLiveStream</code></td></tr>
+            <tr><td>Skipped</td><td>Usernames, votes, comments, permalinks</td><td>Playlists and mixes shown as one tile, ads, view counts, comments, account data</td></tr>
+            <tr><td>Enrichment</td><td>None</td><td>InnerTube <code>/youtubei/v1/player</code>, cookie-less, 5 s timeout, client version scraped from the page HTML</td></tr>
+            <tr><td>Marker placement</td><td><code>start</code>: row above the post content</td><td><code>end</code>: row after the tile, so grid rows stay aligned</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Element reuse</h3>
+      <p>YouTube recycles one tile element for a different video when the feed changes. The controller handles this with two <code>WeakMap</code>s: <code>seenIds</code> (which item an element last showed) and <code>markedIds</code> (which item its marker belongs to). When a mutation inside a known element changes its item ID, the controller clears the stale marker and re-enqueues the element. Hover previews mutate tiles constantly, so the controller compares IDs first and does nothing when the ID is unchanged.</p>
+      <h3>Adding a platform</h3>
+      <ol>
+        <li>Add a <code>FeedItem</code> variant with a <code>site</code> discriminator in <code>src/core/types.ts</code>.</li>
+        <li>Write <code>src/&lt;site&gt;/adapter.ts</code> implementing <code>SiteAdapter</code>, plus an HTML fixture and tests.</li>
+        <li>Add a content script entrypoint that creates <code>new FeedController(adapter)</code>.</li>
+        <li>Add the host to <code>host_permissions</code> and <code>FEED_URL_PATTERNS</code>, update the consent text, and record the decision in an ADR.</li>
+      </ol>
+    </section>
+
+    <section id="providers">
+      <h2>9. Model providers</h2>
+      <p>The user picks one provider in the options page and supplies their own key. No key is ever bundled.</p>
+      <div class="cards">
+        <div class="card">
+          <span class="tag cloud">Default</span>
+          <h3>GroqCloud · <code>openai/gpt-oss-20b</code></h3>
+          <p>OpenAI-compatible chat completions with <code>response_format: json_object</code>, <code>temperature: 0</code>, and low reasoning effort. One request carries the whole batch: all items and all enabled rules as one JSON prompt. The system prompt states that item fields are untrusted data, never instructions. Returns a one-sentence reason (trimmed to 240 chars) for each match.</p>
+        </div>
+        <div class="card">
+          <span class="tag cloud">Alternative</span>
+          <h3>TypeSafe · <code>jev-latest</code></h3>
+          <p>A System One classifier. One request per feed item, with each enabled rule asked as one <code>noul</code> question keyed <code>rule_0…rule_n</code>. A probability ≥ 0.5 is a match. No free text comes back, so injected text in a post cannot change the output shape, but markers show a default reason.</p>
+        </div>
+      </div>
+      <h3>Shared behavior (<code>src/provider/shared.ts</code>)</h3>
+      <ul>
+        <li><code>ProviderError</code> carries a <code>transient</code> flag. HTTP 429 and 5xx are transient. Everything else, including 401 and quota errors, is permanent.</li>
+        <li><code>withRetries</code> makes up to 3 attempts with 400 ms then 800 ms backoff, and only for transient errors. TypeSafe retries per item, so one overloaded item does not resend the others.</li>
+        <li>Groq output is strictly validated by <code>parseResults</code>: valid JSON, a <code>results</code> array, correct types, every expected pair present exactly once, nothing extra.</li>
+        <li><code>testProvider</code> runs one synthetic Reddit item against one synthetic rule. A successful round trip is the definition of "verified".</li>
+      </ul>
+    </section>
+
+    <section id="markers">
+      <h2>10. Markers</h2>
+      <p><code>src/feed/marker.ts</code> draws the only UI Loupe adds to a site.</p>
+      <ul>
+        <li><strong>Style isolation.</strong> A custom <code>&lt;loupe-marker&gt;</code> element with an open shadow root holds its own stylesheet, so site CSS cannot break it and its CSS cannot leak into the site.</li>
+        <li><strong>Normal flow.</strong> The row is prepended or appended inside the item element. No absolute positioning, so it never covers content.</li>
+        <li><strong>Outline, not restyle.</strong> The item gets a 2 px outline in the color of the first matching rule in saved order. The original inline outline is stored in a <code>WeakMap</code> and restored on clear.</li>
+        <li><strong>Text, not HTML.</strong> Rule names and model reasons are set with <code>textContent</code> and text nodes. Model output is never parsed as HTML.</li>
+        <li><strong>Accessible.</strong> Badges are real buttons with <code>aria-expanded</code> and <code>aria-controls</code>, keyboard focus rings, text labels in addition to color, and a dark-mode palette through <code>prefers-color-scheme</code>.</li>
+        <li><strong>Dismissal.</strong> "Dismiss" adds <code>postId + ruleId</code> to an in-memory set and re-renders. The next matching rule then supplies the border, or the marker disappears.</li>
+      </ul>
+    </section>
+
+    <section id="invalidation">
+      <h2>11. Caching and re-analysis</h2>
+      <p>Two fingerprints decide whether work is repeated:</p>
+      <ul>
+        <li><strong>Item fingerprint</strong>: FNV-1a hash of <code>JSON.stringify(item)</code> (<code>src/core/batch.ts</code>). If a post is edited, it is analyzed again.</li>
+        <li><strong>Rules fingerprint</strong>: <code>id:criterion</code> of every enabled rule with a criterion, joined in order (<code>analysisFingerprint</code> in <code>src/core/rules.ts</code>). Names and colors are deliberately excluded.</li>
+      </ul>
+      <p>When <code>STATE_UPDATED</code> arrives, <code>applyState</code> compares the rules fingerprint:</p>
+      <div class="cards">
+        <div class="card"><h3>Fingerprint changed</h3><p>A criterion changed, or a rule was enabled, disabled, added, or deleted. Results, queue, and markers are cleared, and every element near the viewport is enqueued again.</p></div>
+        <div class="card"><h3>Fingerprint unchanged</h3><p>Only a name, color, order, pause state, or consent changed. Markers re-render from cached results with no model call.</p></div>
+      </div>
+      <p>Pausing stops new enqueues but leaves existing markers. "Clear markers on this tab" is a separate, explicit action. A page reload starts with an empty cache and may analyze visible items again. This is the accepted cost of not persisting feed content.</p>
+    </section>
+
+    <section id="privacy">
+      <h2>12. Privacy, trust, and failure</h2>
+      <h3>What leaves the device</h3>
+      <ul>
+        <li>To the selected provider: the fields listed in <a href="#adapters">Site adapters</a> plus the enabled rules (id, name, criterion). Nothing else from the page.</li>
+        <li>To YouTube: one cookie-less player request per analyzed video. YouTube already serves this video to the user's page.</li>
+        <li>Never: usernames, votes, comments, view counts, account data, or browsing history.</li>
+      </ul>
+      <h3>User control</h3>
+      <ul>
+        <li>Analysis cannot start until the user verifies a key and accepts a consent notice that names the provider. The master switch is disabled until consent is given.</li>
+        <li>The popup always shows a <strong>Cloud</strong> indicator while hosted inference is in use.</li>
+        <li>Every match can be explained and dismissed. Markers can be cleared for the tab.</li>
+      </ul>
+      <h3>Fail open</h3>
+      <p>Every error path leaves the site unchanged: a missing key, a network failure, quota exhaustion, invalid model output, failed enrichment, or an unsupported layout. Only the per-tab status changes to <em>error</em>, and the popup shows the message. Authentication and quota errors are not retried automatically.</p>
+      <div class="callout"><p><strong>Platform terms still apply.</strong> Reading the rendered DOM avoids platform API keys. It is not an exemption from platform terms or privacy law. ADR 0007 records that InnerTube use must be reviewed before any public release.</p></div>
+    </section>
+
+    <section id="limits">
+      <h2>13. Limits</h2>
+      <p>All tunable limits live in <code>src/core/constants.ts</code>. They are MVP guardrails for cost, latency, and free-tier token limits, not permanent product rules.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Constant</th><th>Value</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td><code>MAX_RULES</code></td><td>8</td><td>Bounds prompt size and keeps the popup simple. Matches the 8 preset colors.</td></tr>
+            <tr><td><code>MAX_BATCH_SIZE</code></td><td>5</td><td>Spreads rule tokens over several items while keeping latency low.</td></tr>
+            <tr><td><code>MAX_CONCURRENCY</code></td><td>2</td><td>Stays inside provider rate limits. TypeSafe sees at most 10 parallel requests.</td></tr>
+            <tr><td><code>MAX_POST_LENGTH</code></td><td>4,000 chars</td><td>Reddit title + body. Collapsed content is never expanded.</td></tr>
+            <tr><td><code>MAX_DESCRIPTION_LENGTH</code></td><td>1,000 chars</td><td>The top of a YouTube description carries the signal. The rest is links and timestamps.</td></tr>
+            <tr><td><code>MAX_KEYWORDS</code></td><td>20</td><td>YouTube keyword lists can be long and repetitive.</td></tr>
+            <tr><td>Rule name / criterion</td><td>40 / 500 chars</td><td>Enforced in the popup inputs and again by <code>sanitizeRules</code>.</td></tr>
+            <tr><td>IntersectionObserver margin</td><td>600 px</td><td>Starts analysis just before an item scrolls into view, which hides latency.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="website">
+      <h2>14. Website (Next.js)</h2>
+      <p>The repo root is a Next.js 16 App Router project with React 19, Tailwind CSS 4, shadcn/ui on Base UI, and <code>next-themes</code>. It shares no runtime code with the extension. ADR 0001 forbids importing <code>next/*</code> or server actions into extension entrypoints.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Route</th><th>Source</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><code>/</code></td><td><code>app/page.tsx</code></td><td>Starter page, not yet product content.</td></tr>
+            <tr><td><code>/hero/1</code>, <code>/hero/2</code></td><td><code>app/hero/[variant]/page.tsx</code></td><td>Statically generated (<code>generateStaticParams</code>, <code>dynamicParams = false</code>). Each variant shows a waitlist form backed by the <code>joinWaitlist</code> server action, which validates the email but does not persist it yet.</td></tr>
+            <tr><td><code>/design-system</code></td><td><code>app/design-system/page.dev.tsx</code></td><td>Showcase of tokens and components. <code>next.config.ts</code> adds the <code>dev.tsx</code> page extension only under <code>next dev</code>, so this route returns 404 in production builds.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Design tokens are defined as CSS custom properties in <code>app/globals.css</code>, named by role and split into layers. The extension uses its own small Tailwind stylesheet (<code>extension/assets/tailwind.css</code>) and copies of four UI primitives rather than importing from the website, which keeps the two builds independent.</p>
+    </section>
+
+    <section id="quality">
+      <h2>15. Testing and tooling</h2>
+      <p>Extension tests use Vitest with jsdom. DOM tests load saved HTML fixtures (<code>tests/fixtures/reddit-listing.html</code>, <code>youtube-feed.html</code>) so selector breakage shows up as a test failure, not a silent production gap.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Test file</th><th>Covers</th></tr></thead>
+          <tbody>
+            <tr><td><code>adapter.test.ts</code></td><td>Reddit extraction from modern and fallback markup; supported routes</td></tr>
+            <tr><td><code>youtube.test.ts</code></td><td>Outermost-tile discovery, skipping playlists and ads, video ID parsing, player response normalization, cookie-less enrichment, fail-open and retry after error</td></tr>
+            <tr><td><code>provider.test.ts</code></td><td>Groq endpoint, headers, model, strict result validation; TypeSafe question shape, threshold, malformed answers, retry on 529, no retry on 401</td></tr>
+            <tr><td><code>marker.test.ts</code></td><td>Shadow DOM isolation, outline, dismissal</td></tr>
+            <tr><td><code>rules.test.ts</code></td><td>Rules fingerprint, reordering without mutation, sanitizing stored rules</td></tr>
+            <tr><td><code>batch.test.ts</code></td><td>Chunking and stable fingerprints</td></tr>
+          </tbody>
+        </table>
+      </div>
+<pre><code>npm run dev:extension        # WXT dev build with reload
+npm run build:extension      # extension/.output/chrome-mv3, load unpacked
+npm run test:extension       # Vitest
+npm run typecheck:extension  # tsc --noEmit
+npm run lint:extension       # ESLint, zero warnings
+npm run dev                  # Next.js website</code></pre>
+      <p>Manual acceptance from the product brief: scroll at least 50 posts with no duplicate markers or broken site interactions, markers within about 3 seconds, and at least 80% precision and recall on a hand-labeled set of 30 or more posts.</p>
+    </section>
+
+    <section id="adrs">
+      <h2>16. Decision records</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ADR</th><th>Decision</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td>0001</td><td>Separate WXT extension package beside the Next.js site. Popup, options, background, content script roles.</td><td>Accepted. Provider details superseded by 0005.</td></tr>
+            <tr><td>0002</td><td>Hosted analysis pipeline: 8 rules, batches of 5, 2 in flight, tab-memory results, fail open, sanitized content state.</td><td>Accepted</td></tr>
+            <tr><td>0003</td><td>Reddit boundary: modern desktop listings only, 4,000-char limit, minimal fields, style-isolated marker.</td><td>Accepted. Host permission superseded by 0005.</td></tr>
+            <tr><td>0004</td><td>Rule and marker UX: limits, preset colors, ordering, dismissal, status labels, consent.</td><td>Accepted. Disclosure superseded by 0005.</td></tr>
+            <tr><td>0005</td><td>GroqCloud <code>openai/gpt-oss-20b</code> replaces Alibaba Model Studio.</td><td>Accepted</td></tr>
+            <tr><td>0006</td><td>Selectable TypeSafe <code>jev-latest</code> provider. Consent resets on provider change.</td><td>Accepted</td></tr>
+            <tr><td>0007</td><td>YouTube adapter with InnerTube enrichment. Site-independent <code>FeedController</code>.</td><td>Accepted</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="future">
+      <h2>17. Deferred work</h2>
+      <p>These are product capabilities or decisions that the current architecture leaves room for but does not implement.</p>
+      <ul>
+        <li><strong>Local inference.</strong> A WebLLM, WebGPU, or WASM provider behind the existing provider function type, which removes the cloud disclosure.</li>
+        <li><strong>Structured collections.</strong> Extraction of fields into saved records with source links, which needs retention, export, and deletion rules first.</li>
+        <li><strong>On-demand summaries</strong> of threads, comment sections, or profiles.</li>
+        <li><strong>More actions</strong> than highlighting: collapse, hide, rank. Deterministic keyword rules that need no model.</li>
+        <li><strong>More platforms</strong> (X, LinkedIn, and others) as new adapters, each with its own ADR.</li>
+        <li><strong>Public release</strong> work: onboarding, security review, a path off free-tier providers, and a platform-terms review.</li>
+      </ul>
+    </section>
+  </main>
+</div>
+<script>
+/* Highlight the TOC entry for the section in view */
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll("nav.toc a[href^='#']"));
+  var byId = {};
+  links.forEach(function (link) { byId[link.getAttribute("href").slice(1)] = link; });
+  if (!("IntersectionObserver" in window)) return;
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      links.forEach(function (link) { link.classList.remove("active"); });
+      var link = byId[entry.target.id];
+      if (link) link.classList.add("active");
+    });
+  }, { rootMargin: "-20% 0px -70% 0px" });
+  document.querySelectorAll("main section[id]").forEach(function (section) { observer.observe(section); });
+})();
+</script>
+</body>
+</html>

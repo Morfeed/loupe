@@ -36,6 +36,12 @@ function errorDetail(payload: SystemOneResponse): string | undefined {
   return typeof detail === "string" ? `TypeSafe: ${detail.slice(0, 240)}` : undefined;
 }
 
+function stateFor(item: FeedItem): Partial<FeedItem> {
+  const state: Partial<FeedItem> = { ...item };
+  delete state.postId;
+  return state;
+}
+
 async function requestPost(apiKey: string, item: FeedItem, rules: Rule[]): Promise<MatchResult[]> {
   const response = await fetch(providerEndpoint(), {
     method: "POST",
@@ -45,7 +51,7 @@ async function requestPost(apiKey: string, item: FeedItem, rules: Rule[]): Promi
     },
     body: JSON.stringify({
       model: PROVIDERS.typesafe.model,
-      state: { subreddit: item.subreddit, title: item.title, body: item.body },
+      state: stateFor(item),
       questions: questionsFor(rules),
     }),
   });

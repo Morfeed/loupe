@@ -1,4 +1,4 @@
-# Morfeed Product Brief
+# Loupe Product Brief
 
 ## Purpose
 
@@ -6,7 +6,7 @@ Social-media feeds contain useful signals—such as deals, job posts, leads,
 sentiment, events, product mentions, and research material—but finding them
 usually requires manually scrolling through and reading large amounts of noise.
 
-Morfeed is a lightweight, local-first browser extension that helps users find
+Loupe is a lightweight, local-first browser extension that helps users find
 and organize those signals while they browse. It reads content already rendered
 in the current page, applies user-configurable analysis, and changes or augments
 the browsing experience in real time.
@@ -20,8 +20,8 @@ The first delivery target is a dogfood-quality, unpacked Chrome Manifest V3
 extension. It should be useful repeatedly on the developer's own browser rather
 than serving only as a technical demo or being polished for external release.
 
-The MVP will validate Reddit post listings only. X and other platforms are out
-of scope until a later product decision.
+The MVP will validate Reddit post listings and YouTube video listings (see ADR
+0007). X and other platforms are out of scope until a later product decision.
 
 The first vertical slice is intentionally narrower than the full product
 vision: it focuses on evaluating visible feed items against user-defined rules
@@ -46,10 +46,12 @@ might use the criterion "Contains direct insults, harassment, threats, or
 demeaning language." Enabled rules are evaluated against newly observed Reddit
 posts.
 
-A matching result adds a Morfeed badge and colored border directly alongside
+A matching result adds a Loupe badge and colored border directly alongside
 the post in the page DOM. The color comes from the matching rule and is selected
-through a color swatch in the rule editor. The marker must not remove or obscure
-Reddit content.
+through a color swatch in the rule editor. Each rule also selects an action:
+mark the post, hide it behind a `Show` placeholder, or remove it from view.
+Hidden and removed posts stay in the page DOM so that they can be restored
+(see ADR 0008).
 
 Only the visible post content and subreddit name are sent to the hosted model.
 Usernames, vote data, permalinks, comments, and unrelated page content remain
@@ -76,7 +78,7 @@ patterns may be shared, but Next.js runtime features must not enter extension
 entrypoints.
 
 The rule editor offers eight accessible preset color swatches. If multiple
-rules match one post, Morfeed displays one badge per matching rule and uses the
+rules match one post, Loupe displays one badge per matching rule and uses the
 first matching rule's color for the post border. Selecting a badge reveals a
 concise one-sentence explanation; no model-generated confidence percentage is
 shown.
@@ -94,19 +96,23 @@ provider returns one result for every post/rule pair containing `postId`,
 data only: it contains no HTML and no confidence score.
 
 Rules, rule order, marker colors, enabled states, global settings, and cloud
-credentials persist locally. Feed content and classification results remain in
+credentials persist locally. Full feed content and analysis caches remain in
 memory for the current tab and are discarded with that tab. Reloading a page
-may therefore reanalyze visible posts.
+may therefore reanalyze visible posts. A local history keeps a compact record of
+each analyzed item (title, source, link, matching rules, and action) in
+IndexedDB for a user-selected period. Users review, export, and delete it on a
+dashboard page (see ADR 0009).
 
 A master pause switch stops new analysis while retaining existing markers. A
-separate clear action removes all Morfeed markers and borders from the current
+separate clear action removes all Loupe markers and borders from the current
+tab, shows hidden and removed posts, and keeps those matches dismissed for the
 tab. Missing credentials, exhausted quota, network errors, or invalid model
 output must fail open and leave Reddit content unchanged. Temporary failures
 use bounded exponential backoff; authentication and quota failures wait for
 explicit user action instead of retrying continuously.
 
 The master enabled state persists across browser restarts. With valid
-credentials and at least one enabled rule, Morfeed starts automatically on a
+credentials and at least one enabled rule, Loupe starts automatically on a
 supported Reddit listing. The popup reports `Setup required`, `Ready`,
 `Analyzing`, `Paused`, or `Error` and always shows a `Cloud` indicator while the
 MVP uses hosted inference. Before analysis is enabled for the first time, the
@@ -132,7 +138,7 @@ results, and embedded posts are outside the MVP. The extension requests only
 storage access plus host access to the supported Reddit origin and the GroqCloud
 and TypeSafe API endpoints.
 
-Each matching post receives a small, style-isolated Morfeed marker row near the
+Each matching post receives a small, style-isolated Loupe marker row near the
 beginning of its card. The marker uses normal document flow rather than absolute
 positioning, and the post receives an outline in the first matching rule's
 color.
@@ -177,7 +183,7 @@ accordingly.
 
 ### 1. Passive filtering
 
-As the user scrolls, Morfeed observes newly rendered feed items and evaluates
+As the user scrolls, Loupe observes newly rendered feed items and evaluates
 them against user-defined criteria.
 
 Example rules:
@@ -194,7 +200,7 @@ the action.
 ### 2. Active extraction
 
 Users create collections describing information they want to gather as they
-browse. Morfeed identifies matching posts and extracts structured fields into
+browse. Loupe identifies matching posts and extracts structured fields into
 the relevant collection.
 
 Example collections:
@@ -297,7 +303,7 @@ The dogfood MVP is successful when the developer can:
 2. Configure the hosted model without embedding a shared API key in the build.
 3. Create, enable, disable, and persist a plain-language rule.
 4. Scroll an infinite feed and see each newly rendered post evaluated once.
-5. See a clear Morfeed marker injected beside matching posts without breaking
+5. See a clear Loupe marker injected beside matching posts without breaking
    Reddit's own interactions or permanently removing content.
 6. Understand when analysis is running, failed, paused, or using the cloud.
 

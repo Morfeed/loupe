@@ -8,12 +8,15 @@ export type RuleColor =
   | "#8b5cf6"
   | "#ec4899";
 
+export type RuleAction = "mark" | "hide" | "remove";
+
 export interface Rule {
   id: string;
   name: string;
   criterion: string;
   enabled: boolean;
   color: RuleColor;
+  action: RuleAction;
 }
 
 export type ProviderKind = "groq" | "typesafe";
@@ -32,11 +35,17 @@ export interface ProviderSettings {
   verified: boolean;
 }
 
+export interface HistorySettings {
+  enabled: boolean;
+  retentionDays: number;
+}
+
 export interface StoredState {
   enabled: boolean;
   cloudConsent: boolean;
   rules: Rule[];
   provider: ProviderSettings;
+  history: HistorySettings;
 }
 
 export interface ContentState {
@@ -46,11 +55,40 @@ export interface ContentState {
   providerReady: boolean;
 }
 
-export interface FeedItem {
+export interface RedditFeedItem {
+  site: "reddit";
   postId: string;
+  subreddit: string;
   title: string;
   body: string;
-  subreddit: string;
+}
+
+export interface YouTubeFeedItem {
+  site: "youtube";
+  postId: string;
+  channel: string;
+  title: string;
+  description?: string;
+  keywords?: string[];
+  category?: string;
+  durationSeconds?: number;
+  publishDate?: string;
+  isLiveStream?: boolean;
+  isShort?: boolean;
+}
+
+export type FeedItem = RedditFeedItem | YouTubeFeedItem;
+
+export interface SiteAdapter<T extends FeedItem = FeedItem> {
+  isSupportedPage(location: Location | URL): boolean;
+  findItemElements(root: ParentNode): HTMLElement[];
+  closestItemElement(node: Node): HTMLElement | null;
+  extractFeedItem(element: HTMLElement): T | null;
+  /* Must resolve to the original item on any failure so analysis fails open */
+  enrichFeedItem?(item: T): Promise<T>;
+  markerPlacement: "start" | "end";
+  /* "item" hides the element and puts the placeholder before it. "contents" keeps the element box and hides its children. */
+  hideTarget: "item" | "contents";
 }
 
 export interface MatchResult {

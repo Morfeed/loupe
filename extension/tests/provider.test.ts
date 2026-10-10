@@ -4,8 +4,8 @@ import { parseResults, providerEndpoint } from "../src/provider/groq";
 import { providerEndpoint as typesafeEndpoint } from "../src/provider/typesafe";
 import type { FeedItem, Rule } from "../src/core/types";
 
-const items: FeedItem[] = [{ postId: "post", title: "Hiring", body: "React role", subreddit: "jobs" }];
-const rules: Rule[] = [{ id: "rule", name: "Jobs", criterion: "Job listings", enabled: true, color: "#3b82f6" }];
+const items: FeedItem[] = [{ site: "reddit", postId: "post", subreddit: "jobs", title: "Hiring", body: "React role" }];
+const rules: Rule[] = [{ id: "rule", name: "Jobs", criterion: "Job listings", enabled: true, color: "#3b82f6", action: "mark" }];
 
 describe("Groq provider", () => {
   afterEach(() => vi.unstubAllGlobals());
@@ -55,8 +55,8 @@ describe("TypeSafe provider", () => {
     vi.useRealTimers();
   });
 
-  const twoRules: Rule[] = [...rules, { id: "rule-2", name: "Memes", criterion: "Image memes", enabled: true, color: "#ef4444" }];
-  const twoItems: FeedItem[] = [...items, { postId: "post-2", title: "Cat pic", body: "", subreddit: "cats" }];
+  const twoRules: Rule[] = [...rules, { id: "rule-2", name: "Memes", criterion: "Image memes", enabled: true, color: "#ef4444", action: "mark" }];
+  const twoItems: FeedItem[] = [...items, { site: "reddit", postId: "post-2", subreddit: "cats", title: "Cat pic", body: "" }];
 
   function answered(nouls: number[]) {
     return {
@@ -79,8 +79,9 @@ describe("TypeSafe provider", () => {
     const body = JSON.parse(request.body as string);
     expect(body).toMatchObject({
       model: "jev-latest",
-      state: { subreddit: "jobs", title: "Hiring", body: "React role" },
+      state: { site: "reddit", subreddit: "jobs", title: "Hiring", body: "React role" },
     });
+    expect(body.state).not.toHaveProperty("postId");
     expect(Object.keys(body.questions)).toEqual(["rule_0", "rule_1"]);
     expect(body.questions.rule_0).toMatchObject({ type: "noul" });
     expect(body.questions.rule_0.instructions).toContain("Job listings");

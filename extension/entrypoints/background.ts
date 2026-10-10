@@ -1,7 +1,10 @@
 import { browser } from "wxt/browser";
 import type { Runtime } from "wxt/browser";
+import { FEED_URL_PATTERNS, HISTORY_CHANNEL, HISTORY_PRUNE_INTERVAL_MS, MAX_HISTORY_RECORDS } from "../src/core/constants";
 import { loadState, hasReadyProvider } from "../src/core/storage";
-import type { ContentState, ExtensionMessage, ExtensionResponse, StoredState, TabStatus } from "../src/core/types";
+import type { ContentState, ExtensionMessage, ExtensionResponse, FeedItem, MatchResult, Rule, StoredState, TabStatus } from "../src/core/types";
+import { pruneRecords, saveRecords } from "../src/history/db";
+import { buildHistoryRecords } from "../src/history/record";
 import { analyzePosts, testProvider } from "../src/provider";
 
 const tabStatuses = new Map<number, TabStatus>();
@@ -17,7 +20,7 @@ function contentState(state: StoredState): ContentState {
 
 async function broadcastState(): Promise<void> {
   const state = contentState(await loadState());
-  const tabs = await browser.tabs.query({ url: "https://www.reddit.com/*" });
+  const tabs = await browser.tabs.query({ url: FEED_URL_PATTERNS });
   await Promise.all(tabs.flatMap((tab) => tab.id === undefined
     ? []
     : [browser.tabs.sendMessage(tab.id, { type: "STATE_UPDATED", state } satisfies ExtensionMessage).catch(() => undefined)]));
@@ -34,6 +37,30 @@ export default defineBackground(() => {
   };
   void localStorage.setAccessLevel?.({ accessLevel: "TRUSTED_CONTEXTS" });
   browser.tabs.onRemoved.addListener((tabId) => tabStatuses.delete(tabId));
+
+  const historyChannel = new BroadcastChannel(HISTORY_CHANNEL);
+  let lastPrune = 0;
+
+  async function pruneHistory(retentionDays: number): Promise<void> {
+    const now = Date.now();
+    if (now - lastPrune < HISTORY_PRUNE_INTERVAL_MS) return;
+    lastPrune = now;
+    await pruneRecords(retentionDays, MAX_HISTORY_RECORDS, now);
+  }
+
+  /* History is optional, so a failed write must not fail the analysis or its markers */
+  async function recordHistory(state: StoredState, items: FeedItem[], results: MatchResult[], rules: Rule[]): Promise<void> {
+    try {
+      await saveRecords(buildHistoryRecords(items, results, rules, state.provider.kind, Date.now()));
+      await pruneHistory(state.history.retentionDays);
+      historyChannel.postMessage({ type: "history-updated" });
+    } catch {
+      return;
+    }
+  }
+
+  /* Pruning on wake also expires records while history recording is off */
+  void loadState().then((state) => pruneHistory(state.history.retentionDays)).catch(() => undefined);
   browser.storage.onChanged.addListener(() => void broadcastState());
 
   browser.runtime.onMessage.addListener(async (rawMessage: unknown, sender: Runtime.MessageSender): Promise<ExtensionResponse> => {
@@ -74,11 +101,12 @@ export default defineBackground(() => {
     const tabId = sender.tab?.id;
     try {
       const state = await loadState();
-      if (!state.enabled) return { ok: false, error: "Morfeed is paused." };
+      if (!state.enabled) return { ok: false, error: "Loupe is paused." };
       if (!state.cloudConsent || !hasReadyProvider(state)) return { ok: false, error: "Provider setup is required." };
       if (tabId !== undefined) tabStatuses.set(tabId, { status: "analyzing" });
       const results = await analyzePosts(state.provider, message.items, message.rules);
       if (tabId !== undefined) tabStatuses.set(tabId, { status: "ready" });
+      if (state.history.enabled) void recordHistory(state, message.items, results, message.rules);
       return { ok: true, results };
     } catch (error) {
       const detail = error instanceof Error ? error.message : "Analysis failed.";

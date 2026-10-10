@@ -1,5 +1,5 @@
-import { MAX_RULES, RULE_COLORS } from "./constants";
-import type { Rule, RuleColor } from "./types";
+import { MAX_RULES, RULE_ACTIONS, RULE_COLORS } from "./constants";
+import type { Rule, RuleAction, RuleColor } from "./types";
 
 export function createRule(index: number): Rule {
   return {
@@ -8,6 +8,7 @@ export function createRule(index: number): Rule {
     criterion: "",
     enabled: true,
     color: RULE_COLORS[index % RULE_COLORS.length] ?? "#3b82f6",
+    action: "mark",
   };
 }
 
@@ -27,6 +28,8 @@ export function sanitizeRules(value: unknown): Rule[] {
       criterion: rule.criterion.trim().slice(0, 500),
       enabled: rule.enabled,
       color: rule.color as RuleColor,
+      /* Older stored rules have no action, so default it instead of dropping the rule */
+      action: RULE_ACTIONS.includes(rule.action as RuleAction) ? rule.action as RuleAction : "mark",
     }];
   });
 }
@@ -37,6 +40,13 @@ export function moveRule(rules: Rule[], index: number, direction: -1 | 1): Rule[
   const next = [...rules];
   [next[index], next[target]] = [next[target]!, next[index]!];
   return next;
+}
+
+export function strongestAction(actions: RuleAction[]): RuleAction {
+  return actions.reduce<RuleAction>(
+    (strongest, action) => RULE_ACTIONS.indexOf(action) > RULE_ACTIONS.indexOf(strongest) ? action : strongest,
+    "mark",
+  );
 }
 
 export function analysisFingerprint(rules: Rule[]): string {
