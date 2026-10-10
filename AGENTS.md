@@ -10,7 +10,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Product context
 
-Morfeed is a local-first browser extension that analyzes social-feed content
+Loupe is a local-first browser extension that analyzes social-feed content
 already visible in the DOM. Its core capabilities are passive feed filtering,
 structured data collection, and on-demand summarization.
 

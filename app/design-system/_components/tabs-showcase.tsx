@@ -26,7 +26,7 @@ import { Preview, Subsection } from "./section"
 
 const panelCopy = {
   feed: "Posts that passed your filters, in their original order.",
-  hidden: "Everything Morfeed removed, grouped by the rule that matched.",
+  hidden: "Everything Loupe removed, grouped by the rule that matched.",
   insights: "Toxicity, bot and AI-content trends across your platforms.",
 }
 

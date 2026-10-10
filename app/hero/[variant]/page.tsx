@@ -23,7 +23,7 @@ export function generateStaticParams() {
 }
 
 export const metadata: Metadata = {
-  title: "Join the Morfeed waitlist",
+  title: "Join the Loupe waitlist",
   description:
     "Filter toxicity, bots and AI slop from your social feeds with a model you control.",
 }

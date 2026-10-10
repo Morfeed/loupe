@@ -13,7 +13,7 @@ import { ThemeToggle } from "./_components/theme-toggle"
 
 export const metadata: Metadata = {
   title: "Design system",
-  description: "Tokens and components that make up the Morfeed interface.",
+  description: "Tokens and components that make up the Loupe interface.",
 }
 
 export default function DesignSystemLayout({

@@ -11,7 +11,7 @@ export function SeparatorShowcase() {
       <Preview>
         <div className="flex w-full flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <span className="text-sm font-medium">Morfeed</span>
+            <span className="text-sm font-medium">Loupe</span>
             <span className="text-sm text-neutral-foreground">
               Filters social feeds right in the page.
             </span>

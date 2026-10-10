@@ -65,13 +65,13 @@ export default function DesignSystemPage() {
     >
       <div className="flex flex-col gap-3">
         <span className="font-mono text-xs tracking-widest text-neutral-foreground uppercase">
-          Morfeed · feed filtering extension
+          Loupe · feed filtering extension
         </span>
         <h1 className="font-heading text-4xl font-semibold tracking-tight md:text-5xl">
           Design system
         </h1>
         <p className="max-w-2xl text-neutral-foreground">
-          The tokens and components behind Morfeed, the extension that reads
+          The tokens and components behind Loupe, the extension that reads
           your social feeds straight from the page and filters out toxicity,
           bots, AI slop and topics you never asked for. Everything below is
           rendered as it ships in components/ui. Press{" "}

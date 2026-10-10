@@ -138,7 +138,7 @@ function ChatMessageItem({ message }: { message: ChatMessage }) {
       <Avatar role={message.role} />
       <MessageContent>
         <MessageHeader>
-          {isUser ? "You" : "Morfeed"} · {message.time}
+          {isUser ? "You" : "Loupe"} · {message.time}
         </MessageHeader>
         {message.parts.map((part) => (
           <Bubble key={part} role={message.role}>
@@ -360,7 +360,7 @@ function MessageVariantsCard() {
         <Message>
           <Avatar role="assistant" />
           <MessageContent>
-            <MessageHeader>Morfeed</MessageHeader>
+            <MessageHeader>Loupe</MessageHeader>
             <Bubble role="assistant">
               Rule created and applied to 5 platforms.
             </Bubble>

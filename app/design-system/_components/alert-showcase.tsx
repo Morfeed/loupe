@@ -41,7 +41,7 @@ export function AlertShowcase() {
       <Alert>
         <AlertTitle>Auto-click is paused</AlertTitle>
         <AlertDescription>
-          Morfeed stopped clicking &ldquo;Not interested&rdquo; after hitting
+          Loupe stopped clicking &ldquo;Not interested&rdquo; after hitting
           the hourly limit.
         </AlertDescription>
       </Alert>

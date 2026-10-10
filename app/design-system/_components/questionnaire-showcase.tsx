@@ -72,7 +72,7 @@ function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
   toast.add({
     type: "success",
     title: "Filters personalized",
-    description: "Morfeed will apply them the next time you open your feed.",
+    description: "Loupe will apply them the next time you open your feed.",
   })
 }
 
@@ -114,7 +114,7 @@ function OnboardingQuestionnaire() {
           </QuestionnaireItem>
           <QuestionnaireItem name="targets" multiple>
             <QuestionnaireTitle>
-              What should Morfeed filter out?
+              What should Loupe filter out?
             </QuestionnaireTitle>
             <QuestionnaireDescription>
               Select all that apply.

@@ -160,7 +160,7 @@ function FilterRuleFormCard() {
     toast.add({
       type: "success",
       title: "Rule saved",
-      description: "Morfeed will apply it the next time your feed loads.",
+      description: "Loupe will apply it the next time your feed loads.",
     })
   }
 
@@ -188,7 +188,7 @@ function FilterRuleFormCard() {
               <FieldLegend>Model</FieldLegend>
               <FieldDescription>
                 Use your own API key or a model running on your machine. Posts
-                never pass through Morfeed servers.
+                never pass through Loupe servers.
               </FieldDescription>
               <FieldGroup>
                 <div className="grid gap-7 sm:grid-cols-2">
@@ -508,7 +508,7 @@ function FilterRuleFormCard() {
                     Auto-click &ldquo;Not interested&rdquo;
                   </FieldLabel>
                   <FieldDescription>
-                    Teaches the platform&apos;s algorithm while Morfeed filters.
+                    Teaches the platform&apos;s algorithm while Loupe filters.
                   </FieldDescription>
                 </FieldContent>
                 <Switch id="rule-auto-click" defaultChecked />

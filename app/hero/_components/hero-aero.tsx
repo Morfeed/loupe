@@ -50,7 +50,7 @@ export function HeroAero() {
               />
             </span>
             <span className="text-lg font-semibold tracking-tight">
-              Morfeed
+              Loupe
             </span>
           </Link>
 

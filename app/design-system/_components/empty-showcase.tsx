@@ -69,7 +69,7 @@ export function EmptyShowcase() {
           </EmptyMedia>
           <EmptyTitle>Extension not detected</EmptyTitle>
           <EmptyDescription>
-            Install or enable the Morfeed extension, then check again to pair
+            Install or enable the Loupe extension, then check again to pair
             this browser.
           </EmptyDescription>
         </EmptyHeader>

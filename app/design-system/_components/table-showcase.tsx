@@ -326,7 +326,7 @@ function SortButton({
 function RowActions({ post }: { post: CollectedPost }) {
   function copyLink() {
     navigator.clipboard
-      .writeText(`https://morfeed.app/posts/${post.id}`)
+      .writeText(`https://loupe.app/posts/${post.id}`)
       .then(() =>
         toast.add({ title: "Post link copied", description: post.id })
       )
@@ -477,7 +477,7 @@ function CollectedPostsCard() {
       <CardHeader>
         <CardTitle>Collected posts</CardTitle>
         <CardDescription>
-          Everything Morfeed read from your feeds, with the verdict each
+          Everything Loupe read from your feeds, with the verdict each
           detector reached.
         </CardDescription>
         <CardAction>

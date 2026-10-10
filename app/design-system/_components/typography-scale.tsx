@@ -77,14 +77,14 @@ const textStyles = [
     name: "Question title",
     source: "QuestionnaireTitle",
     className: "font-heading text-base font-semibold",
-    sample: "What should Morfeed filter out?",
+    sample: "What should Loupe filter out?",
   },
   {
     name: "Body",
     source: "Card · Dialog · Popover",
     className: "text-sm",
     sample:
-      "Morfeed reads posts from the page, scores them locally or with your own key, then hides what crosses your thresholds.",
+      "Loupe reads posts from the page, scores them locally or with your own key, then hides what crosses your thresholds.",
   },
   {
     name: "Label",
@@ -108,7 +108,7 @@ const textStyles = [
     name: "Caption",
     source: "MessageHeader · SidebarGroupLabel",
     className: "text-xs font-medium text-neutral-foreground",
-    sample: "Morfeed assistant · 9:41 AM",
+    sample: "Loupe assistant · 9:41 AM",
   },
   {
     name: "Numeric",

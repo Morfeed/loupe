@@ -73,7 +73,7 @@ export function DesignSystemSidebar() {
                 <SwatchBookIcon />
               </div>
               <div className="grid flex-1 text-left leading-tight">
-                <span className="truncate font-medium">Morfeed</span>
+                <span className="truncate font-medium">Loupe</span>
                 <span className="truncate text-xs">Design system</span>
               </div>
             </SidebarMenuButton>

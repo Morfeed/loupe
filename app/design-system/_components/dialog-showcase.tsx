@@ -116,7 +116,7 @@ export function DialogShowcase() {
                 never included.
               </DialogDescription>
             </DialogHeader>
-            <Input readOnly defaultValue="https://morfeed.app/rules/8Xk2pQ" />
+            <Input readOnly defaultValue="https://loupe.app/rules/8Xk2pQ" />
             <DialogFooter showCloseButton />
           </DialogContent>
         </Dialog>

@@ -5,7 +5,7 @@
 
 ## Context
 
-Morfeed currently contains a Next.js website and design-system prototypes, but
+Loupe currently contains a Next.js website and design-system prototypes, but
 the dogfood MVP needs Chrome extension entrypoints for a popup, options page,
 background service worker, and Reddit content script. The extension UI should
 retain the existing visual language without inheriting Next.js server/runtime

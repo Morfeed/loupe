@@ -45,7 +45,7 @@ marker strategy that does not interfere with Reddit interactions.
 ## Consequences
 
 - Reddit DOM changes can still break extraction and require fixture updates.
-- Unsupported layouts fail open and receive no Morfeed augmentation.
+- Unsupported layouts fail open and receive no Loupe augmentation.
 - Truncation controls cost but may omit relevant text near the end of a long
   post.
 - Narrow host permissions reduce unnecessary access and make MVP behavior easier

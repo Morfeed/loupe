@@ -52,7 +52,7 @@ export function DropdownMenuShowcase() {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-64">
             <DropdownMenuGroup>
-              <DropdownMenuLabel>alex@morfeed.app</DropdownMenuLabel>
+              <DropdownMenuLabel>alex@loupe.app</DropdownMenuLabel>
               <DropdownMenuItem>
                 <UserIcon />
                 Account

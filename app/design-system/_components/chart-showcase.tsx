@@ -75,7 +75,7 @@ const toxicityTrend = [
 
 const toxicityConfig = {
   raw: { label: "Raw feed", color: "var(--chart-2)" },
-  filtered: { label: "After Morfeed", color: "var(--chart-4)" },
+  filtered: { label: "After Loupe", color: "var(--chart-4)" },
 } satisfies ChartConfig
 
 const filterReasons = [

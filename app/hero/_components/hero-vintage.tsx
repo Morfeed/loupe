@@ -47,7 +47,7 @@ export function HeroVintage() {
           <span className="flex size-9 items-center justify-center rounded-full border border-azure-900/40">
             <WavesIcon aria-hidden="true" className="size-4 text-azure-900" />
           </span>
-          <span className="text-lg font-semibold tracking-tight">Morfeed</span>
+          <span className="text-lg font-semibold tracking-tight">Loupe</span>
         </Link>
 
         <nav aria-label="Primary" className="hidden md:block">
