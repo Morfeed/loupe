@@ -20,8 +20,10 @@ The first delivery target is a dogfood-quality, unpacked Chrome Manifest V3
 extension. It should be useful repeatedly on the developer's own browser rather
 than serving only as a technical demo or being polished for external release.
 
-The MVP will validate Reddit post listings and YouTube video listings (see ADR
-0007). X and other platforms are out of scope until a later product decision.
+The MVP will validate Reddit post listings, YouTube video listings (see ADR
+0007), and X post timelines (see ADR 0010). Users turn each site on or off. X is
+off by default. Other platforms are out of scope until a later product
+decision.
 
 The first vertical slice is intentionally narrower than the full product
 vision: it focuses on evaluating visible feed items against user-defined rules
@@ -143,7 +145,7 @@ beginning of its card. The marker uses normal document flow rather than absolute
 positioning, and the post receives an outline in the first matching rule's
 color.
 
-X is outside the MVP rather than a parallel workstream. The existing Next.js
+The existing Next.js
 website remains in the repository, and the Chrome extension will be added as an
 isolated workspace in the same repository.
 
@@ -225,8 +227,9 @@ to analyze.
 
 ## Initial platform scope
 
-Reddit post listings are the only supported platform surface for the MVP.
-Longer-term candidates include X, Facebook, LinkedIn, and Instagram.
+Reddit post listings, YouTube video listings, and X post timelines are the
+supported platform surfaces for the MVP. Longer-term candidates include
+Facebook, LinkedIn, and Instagram.
 Support should be added through isolated, site-specific adapters rather than a
 single set of fragile global selectors.
 
@@ -327,7 +330,7 @@ These questions are intentionally outside the dogfood MVP:
 - How should the product transition away from Groq's free tier before external
   distribution?
 - Should rules support subreddit-specific scope?
-- When should X or another platform adapter be added?
+- When should another platform adapter be added?
 - Which structured collection and summarization workflows should be built first?
 - Which export formats are required for collected data?
 - What onboarding, security, and support work is required for public release?

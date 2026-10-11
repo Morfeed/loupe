@@ -36,6 +36,15 @@ describe("history records", () => {
     expect(JSON.stringify([reddit, short])).not.toMatch(/Private details|Long description/);
   });
 
+  it("keeps only the start of an X post and no author", () => {
+    const text = `${"Long post ".repeat(20)}secret tail`;
+    const [xPost] = buildHistoryRecords([{ site: "x", postId: "1840000000000000001", text, quote: "Quoted text" }], [], rules, "groq", 1_000);
+    expect(xPost?.url).toBe("https://x.com/i/status/1840000000000000001");
+    expect(xPost?.title).toHaveLength(140);
+    expect(xPost?.source).toBe("");
+    expect(JSON.stringify(xPost)).not.toMatch(/secret tail|Quoted text/);
+  });
+
   it("copies matching rules and applies the strongest action", () => {
     expect(reddit?.source).toBe("r/forhire");
     expect(reddit?.matches.map((match) => match.ruleName)).toEqual(["Jobs", "Rage"]);

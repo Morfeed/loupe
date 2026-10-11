@@ -64,6 +64,7 @@ export function extractFeedItem(element: HTMLElement): RedditFeedItem | null {
 }
 
 export const redditAdapter: SiteAdapter<RedditFeedItem> = {
+  site: "reddit",
   isSupportedPage: isSupportedRedditFeed,
   findItemElements: findPostElements,
   closestItemElement: (node) => (node instanceof Element ? node : node.parentElement)?.closest<HTMLElement>(POST_SELECTOR) ?? null,

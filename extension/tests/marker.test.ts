@@ -35,6 +35,18 @@ describe("marker", () => {
     expect(post.querySelector("loupe-marker")).toBeNull();
   });
 
+  it("keeps marker clicks and keys away from the post", () => {
+    const post = feedPost();
+    const siteHandler = vi.fn();
+    post.addEventListener("click", siteHandler);
+    post.addEventListener("keydown", siteHandler);
+    renderMarker(post, [match], [rule], options());
+    const badge = post.querySelector("loupe-marker")?.shadowRoot?.querySelector<HTMLButtonElement>(".badge");
+    badge?.click();
+    badge?.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, composed: true }));
+    expect(siteHandler).not.toHaveBeenCalled();
+  });
+
   it("hides the item behind a placeholder with a Show button", () => {
     const post = feedPost();
     const show = vi.fn();

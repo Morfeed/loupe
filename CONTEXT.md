@@ -10,7 +10,8 @@ tests, and architecture records.
 A platform-independent representation of one visible social-feed post. For the
 MVP, a Reddit feed item contains visible post content and its subreddit name. A
 YouTube feed item contains the video title and channel, enriched with public
-video details such as description, keywords, category, and duration. Feed
+video details such as description, keywords, category, and duration. An X
+feed item contains the visible post text and the text of a quoted post. Feed
 items do not include comments, votes, view counts, usernames, or profile data.
 
 ### Adapter
@@ -30,8 +31,14 @@ from the page.
 A user-defined classification criterion. An MVP rule has an identifier, short
 name, detailed criterion, enabled state, selected marker color, action, and
 saved order.
-Rules apply across all supported Reddit post listings and YouTube video listings. Their order determines
+Rules apply across every enabled site. Their order determines
 which matching rule supplies a post's border color.
+
+### Site
+
+A platform that Loupe supports: Reddit, YouTube, or X. Each site has a switch.
+Loupe analyzes feed items only on enabled sites. X is off by default (see ADR
+0010).
 
 ### Action
 
@@ -53,8 +60,8 @@ reveal its explanation or dismiss that match for the current tab.
 
 ### History record
 
-A compact, local record of one analyzed feed item: its title, subreddit or
-channel, a locally built link, the matching rules with reasons, and the
+A compact, local record of one analyzed feed item: its title (for X, the start
+of the post text), subreddit or channel, a locally built link, the matching rules with reasons, and the
 resulting action. History records live in the extension's IndexedDB, expire
 after the retention period, and never contain post bodies or video
 descriptions (see ADR 0009).

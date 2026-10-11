@@ -102,8 +102,12 @@ export class FeedController<T extends FeedItem> {
     if (this.nearby.has(element)) this.enqueue(element);
   }
 
+  private siteEnabled(): boolean {
+    return Boolean(this.state?.sites[this.adapter.site]);
+  }
+
   private enqueue(element: HTMLElement): void {
-    if (!this.adapter.isSupportedPage(window.location)) return;
+    if (!this.adapter.isSupportedPage(window.location) || !this.siteEnabled()) return;
     if (!this.state?.enabled || !this.state.cloudConsent || !this.state.providerReady) return;
     const activeRules = this.state.rules.filter((rule) => rule.enabled && rule.criterion);
     if (!activeRules.length) return;
@@ -151,7 +155,7 @@ export class FeedController<T extends FeedItem> {
       const postResults = response.results.filter((result) => result.postId === item.postId);
       this.processed.set(item.postId, `${feedItemFingerprint(item)}:${requestFingerprint}`);
       this.results.set(item.postId, postResults);
-      if (this.adapter.extractFeedItem(element)?.postId === item.postId) this.render(element, item.postId, postResults, this.state.rules);
+      if (this.siteEnabled() && this.adapter.extractFeedItem(element)?.postId === item.postId) this.render(element, item.postId, postResults, this.state.rules);
     }
   }
 
@@ -193,8 +197,18 @@ export class FeedController<T extends FeedItem> {
 
   private applyState(state: ContentState): void {
     const previousFingerprint = this.rulesFingerprint;
+    const wasSiteEnabled = this.siteEnabled();
     this.state = state;
     this.rulesFingerprint = analysisFingerprint(this.state.rules);
+
+    /* Keep results, so turning the site on again restores markers without new requests */
+    if (!this.siteEnabled()) {
+      this.queue = [];
+      this.queuedIds.clear();
+      this.known.forEach(clearMarker);
+      this.markedIds = new WeakMap();
+      return;
+    }
 
     if (previousFingerprint !== this.rulesFingerprint) {
       this.processed.clear();
@@ -203,6 +217,11 @@ export class FeedController<T extends FeedItem> {
       this.queuedIds.clear();
       this.known.forEach(clearMarker);
       this.markedIds = new WeakMap();
+      this.nearby.forEach((element) => this.enqueue(element));
+      return;
+    }
+
+    if (!wasSiteEnabled) {
       this.nearby.forEach((element) => this.enqueue(element));
       return;
     }

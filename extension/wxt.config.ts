@@ -8,11 +8,12 @@ export default defineConfig({
   }),
   manifest: {
     name: "Loupe",
-    description: "Mark, hide, or remove Reddit posts and YouTube videos that match your rules with AI.",
+    description: "Mark, hide, or remove Reddit posts, YouTube videos, and X posts that match your rules with AI.",
     permissions: ["storage", "tabs", "unlimitedStorage"],
     host_permissions: [
       "https://www.reddit.com/*",
       "https://www.youtube.com/*",
+      "https://x.com/*",
       "https://api.groq.com/*",
       "https://api.typesafe.ai/*",
     ],

@@ -83,6 +83,7 @@ export async function enrichFeedItem(item: YouTubeFeedItem): Promise<YouTubeFeed
 }
 
 export const youtubeAdapter: SiteAdapter<YouTubeFeedItem> = {
+  site: "youtube",
   isSupportedPage: isSupportedYouTubePage,
   findItemElements: findVideoElements,
   closestItemElement: (node) => outermostTile((node instanceof Element ? node : node.parentElement)?.closest<HTMLElement>(TILE_SELECTOR) ?? null),

@@ -21,6 +21,14 @@ export interface Rule {
 
 export type ProviderKind = "groq" | "typesafe";
 
+export type SiteId = FeedItem["site"];
+
+export interface SiteInfo {
+  label: string;
+  /* What the cloud consent text says Loupe sends for this site */
+  sends: string;
+}
+
 export interface ProviderInfo {
   label: string;
   model: string;
@@ -43,6 +51,7 @@ export interface HistorySettings {
 export interface StoredState {
   enabled: boolean;
   cloudConsent: boolean;
+  sites: Record<SiteId, boolean>;
   rules: Rule[];
   provider: ProviderSettings;
   history: HistorySettings;
@@ -51,6 +60,7 @@ export interface StoredState {
 export interface ContentState {
   enabled: boolean;
   cloudConsent: boolean;
+  sites: Record<SiteId, boolean>;
   rules: Rule[];
   providerReady: boolean;
 }
@@ -77,9 +87,18 @@ export interface YouTubeFeedItem {
   isShort?: boolean;
 }
 
-export type FeedItem = RedditFeedItem | YouTubeFeedItem;
+export interface XFeedItem {
+  site: "x";
+  postId: string;
+  text: string;
+  /* A quote post often means nothing without the post that it quotes */
+  quote?: string;
+}
+
+export type FeedItem = RedditFeedItem | YouTubeFeedItem | XFeedItem;
 
 export interface SiteAdapter<T extends FeedItem = FeedItem> {
+  site: T["site"];
   isSupportedPage(location: Location | URL): boolean;
   findItemElements(root: ParentNode): HTMLElement[];
   closestItemElement(node: Node): HTMLElement | null;

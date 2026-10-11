@@ -2,7 +2,11 @@
 import { strongestAction } from "../core/rules";
 import type { FeedItem, MatchResult, ProviderKind, Rule, RuleAction, RuleColor } from "../core/types";
 import { redditPostUrl } from "../reddit/link";
+import { xPostUrl } from "../x/link";
 import { youtubeVideoUrl } from "../youtube/link";
+
+/* An X post has no title, so the record keeps only the start of its text */
+const X_TITLE_LENGTH = 140;
 
 export interface HistoryMatch {
   ruleId: string;
@@ -31,15 +35,22 @@ export function historyId(item: FeedItem): string {
   return `${item.site}:${item.postId}`;
 }
 
+function title(item: FeedItem): string {
+  return item.site === "x" ? (item.text || item.quote || "").slice(0, X_TITLE_LENGTH) : item.title;
+}
+
+/* X has no community or channel, and the author is a username that Loupe does not collect */
 function source(item: FeedItem): string {
-  return item.site === "reddit" ? `r/${item.subreddit}` : item.channel;
+  if (item.site === "reddit") return `r/${item.subreddit}`;
+  return item.site === "youtube" ? item.channel : "";
 }
 
 function itemUrl(item: FeedItem): string | undefined {
-  return item.site === "reddit" ? redditPostUrl(item) : youtubeVideoUrl(item);
+  if (item.site === "reddit") return redditPostUrl(item);
+  return item.site === "youtube" ? youtubeVideoUrl(item) : xPostUrl(item);
 }
 
-/* Records keep the title, source, and link only. Post bodies and video descriptions stay out of storage. */
+/* Records keep the title, source, and link only. Post bodies, video descriptions, and full X posts stay out of storage. */
 export function buildHistoryRecords(
   items: FeedItem[],
   results: MatchResult[],
@@ -64,7 +75,7 @@ export function buildHistoryRecords(
       id: historyId(item),
       site: item.site,
       postId: item.postId,
-      title: item.title,
+      title: title(item),
       source: source(item),
       ...(url ? { url } : {}),
       matches,

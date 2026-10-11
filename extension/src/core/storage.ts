@@ -2,7 +2,8 @@ import { browser } from "wxt/browser";
 import { loadHistorySettings } from "../history/settings";
 import { DEFAULT_STATE, PROVIDER_KINDS, STORAGE_KEY } from "./constants";
 import { sanitizeRules } from "./rules";
-import type { ProviderKind, ProviderSettings, StoredState } from "./types";
+import { loadSites } from "./sites";
+import type { ProviderKind, ProviderSettings, SiteId, StoredState } from "./types";
 
 interface PersistedProvider {
   kind?: string;
@@ -10,8 +11,9 @@ interface PersistedProvider {
   verified?: boolean;
 }
 
-type PersistedState = Omit<Partial<StoredState>, "provider"> & {
+type PersistedState = Omit<Partial<StoredState>, "provider" | "sites"> & {
   provider?: PersistedProvider;
+  sites?: Partial<Record<SiteId, unknown>>;
 };
 
 export function isProviderKind(kind: unknown): kind is ProviderKind {
@@ -34,6 +36,7 @@ export async function loadState(): Promise<StoredState> {
   return {
     enabled: stored.enabled ?? DEFAULT_STATE.enabled,
     cloudConsent: isProviderKind(stored.provider?.kind) ? (stored.cloudConsent ?? DEFAULT_STATE.cloudConsent) : false,
+    sites: loadSites(stored.sites),
     rules: sanitizeRules(stored.rules),
     provider: loadProvider(stored.provider),
     history: loadHistorySettings(stored.history),

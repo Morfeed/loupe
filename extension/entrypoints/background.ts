@@ -13,6 +13,7 @@ function contentState(state: StoredState): ContentState {
   return {
     enabled: state.enabled,
     cloudConsent: state.cloudConsent,
+    sites: state.sites,
     rules: state.rules,
     providerReady: hasReadyProvider(state),
   };
@@ -103,6 +104,8 @@ export default defineBackground(() => {
       const state = await loadState();
       if (!state.enabled) return { ok: false, error: "Loupe is paused." };
       if (!state.cloudConsent || !hasReadyProvider(state)) return { ok: false, error: "Provider setup is required." };
+      /* A tab can send a batch before it receives the state that turns its site off */
+      if (!message.items.every((item) => state.sites[item.site])) return { ok: false, error: "Loupe is off for this site." };
       if (tabId !== undefined) tabStatuses.set(tabId, { status: "analyzing" });
       const results = await analyzePosts(state.provider, message.items, message.rules);
       if (tabId !== undefined) tabStatuses.set(tabId, { status: "ready" });

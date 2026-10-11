@@ -57,6 +57,8 @@ function ensurePageStyle(): void {
 function createHost(): { host: HTMLElement; shadow: ShadowRoot } {
   const host = document.createElement(MARKER_TAG);
   host.setAttribute("data-loupe-marker", "");
+  /* Sites such as X open a post on any click or Enter inside it. Marker events must not reach the site. */
+  for (const type of ["click", "keydown"]) host.addEventListener(type, (event) => event.stopPropagation());
   const shadow = host.attachShadow({ mode: "open" });
   shadow.append(createElement("style", undefined, MARKER_STYLE));
   return { host, shadow };

@@ -1,4 +1,4 @@
-import type { ProviderInfo, ProviderKind, RuleAction, RuleColor, StoredState } from "./types";
+import type { ProviderInfo, ProviderKind, RuleAction, RuleColor, SiteId, SiteInfo, StoredState } from "./types";
 
 export const STORAGE_KEY = "loupe-state";
 
@@ -21,7 +21,15 @@ export const PROVIDERS: Record<ProviderKind, ProviderInfo> = {
 
 export const PROVIDER_KINDS = Object.keys(PROVIDERS) as ProviderKind[];
 
-export const FEED_URL_PATTERNS = ["https://www.reddit.com/*", "https://www.youtube.com/*"];
+export const SITES: Record<SiteId, SiteInfo> = {
+  reddit: { label: "Reddit", sends: "visible Reddit post text and subreddits" },
+  youtube: { label: "YouTube", sends: "public YouTube video details such as title, channel, and description" },
+  x: { label: "X", sends: "visible X post text and the posts they quote" },
+};
+
+export const SITE_IDS = Object.keys(SITES) as SiteId[];
+
+export const FEED_URL_PATTERNS = ["https://www.reddit.com/*", "https://www.youtube.com/*", "https://x.com/*"];
 
 export const MAX_RULES = 8;
 export const MAX_POST_LENGTH = 4_000;
@@ -54,6 +62,12 @@ export const RULE_ACTIONS: RuleAction[] = ["mark", "hide", "remove"];
 export const DEFAULT_STATE: StoredState = {
   enabled: true,
   cloudConsent: false,
+  /* X is off by default because consent given before X support did not cover X posts */
+  sites: {
+    reddit: true,
+    youtube: true,
+    x: false,
+  },
   rules: [],
   provider: {
     kind: "groq",

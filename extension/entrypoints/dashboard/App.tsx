@@ -5,7 +5,7 @@ import { browser } from "wxt/browser";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Switch } from "../../components/ui/switch";
-import { HISTORY_CHANNEL, HISTORY_RETENTION_DAYS, MAX_HISTORY_RECORDS } from "../../src/core/constants";
+import { HISTORY_CHANNEL, HISTORY_RETENTION_DAYS, MAX_HISTORY_RECORDS, SITE_IDS, SITES } from "../../src/core/constants";
 import { loadState, saveState } from "../../src/core/storage";
 import type { HistorySettings, StoredState } from "../../src/core/types";
 import { clearRecords, listRecords, pruneRecords } from "../../src/history/db";
@@ -14,7 +14,6 @@ import type { HistoryRecord } from "../../src/history/record";
 
 const PAGE_SIZE = 100;
 const SELECT_CLASS = "h-9 rounded-md border border-zinc-300 bg-white px-2 text-sm dark:border-zinc-700 dark:bg-zinc-950";
-const siteLabels: Record<HistoryRecord["site"], string> = { reddit: "Reddit", youtube: "YouTube" };
 const actionLabels: Record<HistoryRecord["action"], string> = { none: "Not matched", mark: "Marked", hide: "Hidden", remove: "Removed" };
 const timeFormat = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" });
 
@@ -156,8 +155,7 @@ export function App() {
           />
           <select aria-label="Site" className={SELECT_CLASS} value={filters.site} onChange={(event) => updateFilters({ site: event.target.value as HistoryFilters["site"] })}>
             <option value="all">All sites</option>
-            <option value="reddit">Reddit</option>
-            <option value="youtube">YouTube</option>
+            {SITE_IDS.map((site) => <option key={site} value={site}>{SITES[site].label}</option>)}
           </select>
           <select aria-label="Action" className={SELECT_CLASS} value={filters.action} onChange={(event) => updateFilters({ action: event.target.value as HistoryFilters["action"] })}>
             <option value="all">All results</option>
@@ -188,7 +186,7 @@ export function App() {
 
       {filtered.length === 0 ? (
         <div className="rounded-lg border border-dashed border-zinc-300 p-10 text-center text-sm text-zinc-500 dark:border-zinc-700">
-          {records.length ? "No records match these filters." : "No history yet. Browse Reddit or YouTube with Loupe enabled."}
+          {records.length ? "No records match these filters." : "No history yet. Browse a site that Loupe analyzes."}
         </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
@@ -205,7 +203,7 @@ export function App() {
               {filtered.slice(0, visible).map((record) => (
                 <tr key={record.id} className="align-top">
                   <td className="whitespace-nowrap px-4 py-3 text-xs text-zinc-500">{timeFormat.format(record.lastAnalyzed)}</td>
-                  <td className="px-4 py-3 text-xs">{siteLabels[record.site]}</td>
+                  <td className="px-4 py-3 text-xs">{SITES[record.site].label}</td>
                   <td className="px-4 py-3">
                     {record.url ? (
                       <a href={record.url} target="_blank" rel="noreferrer" className="inline-flex items-start gap-1 font-medium hover:underline">
@@ -214,7 +212,7 @@ export function App() {
                     ) : (
                       <span className="font-medium">{record.title}</span>
                     )}
-                    <p className="text-xs text-zinc-500">{record.source}</p>
+                    {record.source && <p className="text-xs text-zinc-500">{record.source}</p>}
                     {record.matches.map((match) => (
                       <p key={match.ruleId} className="mt-1 flex items-start gap-1.5 text-xs">
                         <span className="mt-1 size-2 shrink-0 rounded-full" style={{ backgroundColor: match.ruleColor }} />

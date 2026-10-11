@@ -5,7 +5,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Switch } from "../../components/ui/switch";
 import { Textarea } from "../../components/ui/textarea";
-import { MAX_RULES, PROVIDERS, RULE_ACTIONS, RULE_COLORS } from "../../src/core/constants";
+import { MAX_RULES, PROVIDERS, RULE_ACTIONS, RULE_COLORS, SITE_IDS, SITES } from "../../src/core/constants";
 import { createRule, moveRule } from "../../src/core/rules";
 import { hasReadyProvider, loadState, saveState } from "../../src/core/storage";
 import type { ExtensionMessage, ExtensionResponse, Rule, RuleAction, StoredState, TabStatus } from "../../src/core/types";
@@ -101,7 +101,10 @@ export function App() {
       <section className="space-y-3 p-4">
         {!state.cloudConsent && (
           <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-950 dark:border-blue-900 dark:bg-blue-950 dark:text-blue-100">
-            <p>Loupe sends visible Reddit post text and subreddits, public YouTube video details such as title, channel, and description, and your enabled rules to {providerLabel} for analysis.</p>
+            <p>Loupe sends your enabled rules and this content to {providerLabel} for analysis:</p>
+            <ul className="mt-1 list-disc pl-4">
+              {SITE_IDS.map((site) => <li key={site}>{SITES[site].sends}</li>)}
+            </ul>
             <Button className="mt-3" size="sm" onClick={() => void commit({ ...state, cloudConsent: true })}>Allow cloud analysis</Button>
           </div>
         )}
@@ -111,6 +114,23 @@ export function App() {
             Add and verify your {providerLabel} API key to start.
           </button>
         )}
+
+        <div>
+          <h2 className="font-semibold">Sites</h2>
+          <p className="text-xs text-zinc-500">Loupe analyzes only the sites that you turn on.</p>
+          <div className="mt-2 grid grid-cols-3 gap-2">
+            {SITE_IDS.map((site) => (
+              <label key={site} className="flex items-center justify-between gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-xs font-medium dark:border-zinc-800 dark:bg-zinc-950">
+                {SITES[site].label}
+                <Switch
+                  checked={state.sites[site]}
+                  label={`Analyze ${SITES[site].label}`}
+                  onCheckedChange={(enabled) => void commit({ ...state, sites: { ...state.sites, [site]: enabled } })}
+                />
+              </label>
+            ))}
+          </div>
+        </div>
 
         <div className="flex items-center justify-between">
           <div>
