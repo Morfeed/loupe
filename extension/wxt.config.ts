@@ -3,8 +3,18 @@ import { defineConfig } from "wxt";
 
 export default defineConfig({
   modules: ["@wxt-dev/module-react"],
+  /* Root shadcn components import their siblings through these paths */
+  alias: {
+    "@/components": "../components",
+    "@/hooks": "../hooks",
+    "@/lib": "../lib",
+  },
   vite: () => ({
     plugins: [tailwindcss()],
+    /* Root components resolve React from the root node_modules. Two React copies break hooks. */
+    resolve: {
+      dedupe: ["react", "react-dom"],
+    },
   }),
   manifest: {
     name: "Loupe",

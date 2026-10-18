@@ -1,0 +1,11 @@
+/* Dashboard styles from the website design system */
+
+@import "@fontsource-variable/geist";
+@import "../../../app/globals.css";
+
+@source "../../../components/ui";
+
+/* The website sets this variable with next/font. Unlayered, so it beats the Tailwind theme layer. */
+:root {
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+}
